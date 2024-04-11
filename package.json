@@ -13,7 +13,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --coverage --runInBand --forceExit",
-    "start": "node index.js"
+    "start": "node index.js",
+    "build": "grunt dist",
+    "heroku-postbuild": "npm install && npm run build"
   },
   "keywords": [],
   "author": "",
