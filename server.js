@@ -47,21 +47,22 @@ app.post('/signup', async (req, res) => {
 
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
-
+    res.json({message: 'inside login'});
     try {
         const user = await UserModel.findOne({ email });
+        res.json({message: 'inside try block'});
         if (!user) {
             return res.status(404).json({ message: "No account exists with this email." });
         }
-
+        res.json({message: 'inside try block 2'});
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
         if (!isPasswordCorrect) {
             return res.status(401).json({ message: "The password is incorrect." });
         }
-
+        res.json({message: 'inside try block 3'});
         // Include user's email in the token
         const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '5m' });
-
+        
         res.json({ message: "Success", token });
     } catch (err) {
         console.error(err);
