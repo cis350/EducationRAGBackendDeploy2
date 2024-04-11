@@ -16,6 +16,11 @@ app.use(cors())
 //mongoose.connect("mongodb+srv://madhavpuri100:@cluster0.xnjfdga.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0");
 mongoose.connect("mongodb+srv://madhavpuri100:k8c6gNkdmon2hves@cluster0.hjtbryn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0");
 
+// root endpoint route
+app.get('/', (_req, resp) =>{
+  resp.json({message: 'hello CIS3500 friends!!!'})
+});
+
 app.post('/signup', async (req, res) => {
     const { email, password } = req.body;
 
