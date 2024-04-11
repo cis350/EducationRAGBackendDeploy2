@@ -11,6 +11,9 @@
   "name": "server",
   "version": "1.0.0",
   "main": "index.js",
+  "engines": {
+    "node": "16.x"
+  },
   "scripts": {
     "test": "jest --coverage --runInBand --forceExit",
     "start": "node index.js"
