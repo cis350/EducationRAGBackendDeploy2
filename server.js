@@ -21,72 +21,72 @@ app.get('/', (_req, resp) =>{
   resp.json({message: 'hello CIS3500 friends!!!'})
 });
 
-app.post('/signup', async (req, res) => {
-    const { email, password } = req.body;
+app.post('/signup', async (_req, resp) => {
+    const { email, password } = _req.body;
 
     if (password.length < 8) {
-        return res.status(400).json({ message: "Password must be at least 8 characters long." });
+        return resp.status(400).json({ message: "Password must be at least 8 characters long." });
     }
 
     try {
         const existingUser = await UserModel.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ message: "An account with this email already exists." });
+            return resp.status(400).json({ message: "An account with this email already exists." });
         }
 
         const hashedPassword = await bcrypt.hash(password, 12);
 
         const user = await UserModel.create({ email, password: hashedPassword });
         
-        res.status(201).json({ message: "User created successfully." });
+        resp.status(201).json({ message: "User created successfully." });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: "Error creating user." });
+        resp.status(500).json({ message: "Error creating user." });
     }
 });
 
-app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+app.post('/login', async (_req, resp) => {
+    const { email, password } = _req.body;
 
     try {
         const user = await UserModel.findOne({ email });
         if (!user) {
-            return res.status(404).json({ message: "No account exists with this email." });
+            return resp.status(404).json({ message: "No account exists with this email." });
         }
 
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
         if (!isPasswordCorrect) {
-            return res.status(401).json({ message: "The password is incorrect." });
+            return resp.status(401).json({ message: "The password is incorrect." });
         }
 
         // Include user's email in the token
         const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '5m' });
 
-        res.json({ message: "Success", token });
+        resp.json({ message: "Success", token });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: "Server error." });
+        resp.status(500).json({ message: "Server error." });
     }
 });
 
-app.get('/get-user-id', verifyToken, async (req, res) => {
-    const email = req.email; // Extracted from the token in `verifyToken` middleware
+app.get('/get-user-id', verifyToken, async (_req, resp) => {
+    const email = _req.email; // Extracted from the token in `verifyToken` middleware
 
     try {
         const user = await UserModel.findOne({ email: email }).select('_id');
         if (!user) {
-            return res.status(404).json({ message: "User not found." });
+            return resp.status(404).json({ message: "User not found." });
         }
 
-        res.json({ userId: user._id });
+        resp.json({ userId: user._id });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: "Error fetching user ID." });
+        resp.status(500).json({ message: "Error fetching user ID." });
     }
 });
 
-app.post('/update-settings', verifyToken, async (req, res) => {
-    const { userId, settings } = req.body;
+app.post('/update-settings', verifyToken, async (_req, resp) => {
+    const { userId, settings } = _req.body;
 
     console.log(userId, settings)
 
@@ -97,35 +97,35 @@ app.post('/update-settings', verifyToken, async (req, res) => {
         }, { new: true });
 
         if (!updatedUser) {
-            return res.status(404).json({ message: "User not found." });
+            return resp.status(404).json({ message: "User not found." });
         }
 
-        res.json({ message: "Settings updated successfully." });
+        resp.json({ message: "Settings updated successfully." });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: "Error updating settings." });
+        resp.status(500).json({ message: "Error updating settings." });
     }
 });
 
-app.get('/get-user-settings', verifyToken, async (req, res) => {
-    const email = req.email; // Extracted from the token in `verifyToken` middleware
+app.get('/get-user-settings', verifyToken, async (_req, resp) => {
+    const email = _req.email; // Extracted from the token in `verifyToken` middleware
 
     try {
         const user = await UserModel.findOne({ email: email }, 'settings');
         if (!user) {
-            return res.status(404).json({ message: "User not found." });
+            return resp.status(404).json({ message: "User not found." });
         }
 
-        res.json({ settings: user.settings });
+        resp.json({ settings: user.settings });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: "Error fetching user settings." });
+        resp.status(500).json({ message: "Error fetching user settings." });
     }
 });
 
-app.get('/protected-route', verifyToken, (req, res) => {
+app.get('/protected-route', verifyToken, (_req, resp) => {
     // This route is now protected, your route logic here
-    res.json({ message: "This is protected data." });
+    resp.json({ message: "This is protected data." });
 });
 
 

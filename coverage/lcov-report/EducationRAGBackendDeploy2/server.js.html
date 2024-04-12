@@ -358,72 +358,72 @@ app.get('/', <span class="fstat-no" title="function not covered" >(_</span>req, 
 <span class="cstat-no" title="statement not covered" >  resp.json({message: 'hello CIS3500 friends!!!'})</span>
 });
 &nbsp;
-app.post('/signup', async (req, res) =&gt; {
-    const { email, password } = req.body;
+app.post('/signup', async (_req, resp) =&gt; {
+    const { email, password } = _req.body;
 &nbsp;
     if (password.length &lt; 8) {
-        return res.status(400).json({ message: "Password must be at least 8 characters long." });
+        return resp.status(400).json({ message: "Password must be at least 8 characters long." });
     }
 &nbsp;
     try {
         const existingUser = await UserModel.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ message: "An account with this email already exists." });
+            return resp.status(400).json({ message: "An account with this email already exists." });
         }
 &nbsp;
         const hashedPassword = await bcrypt.hash(password, 12);
 &nbsp;
         const user = await UserModel.create({ email, password: hashedPassword });
         
-        res.status(201).json({ message: "User created successfully." });
+        resp.status(201).json({ message: "User created successfully." });
     } catch (err) {
 <span class="cstat-no" title="statement not covered" >        console.error(err);</span>
-<span class="cstat-no" title="statement not covered" >        res.status(500).json({ message: "Error creating user." });</span>
+<span class="cstat-no" title="statement not covered" >        resp.status(500).json({ message: "Error creating user." });</span>
     }
 });
 &nbsp;
-app.post('/login', async (req, res) =&gt; {
-    const { email, password } = req.body;
+app.post('/login', async (_req, resp) =&gt; {
+    const { email, password } = _req.body;
 &nbsp;
     try {
         const user = await UserModel.findOne({ email });
         if (!user) {
-            return res.status(404).json({ message: "No account exists with this email." });
+            return resp.status(404).json({ message: "No account exists with this email." });
         }
 &nbsp;
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
         if (!isPasswordCorrect) {
-            return res.status(401).json({ message: "The password is incorrect." });
+            return resp.status(401).json({ message: "The password is incorrect." });
         }
 &nbsp;
         // Include user's email in the token
         const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: '5m' });
 &nbsp;
-        res.json({ message: "Success", token });
+        resp.json({ message: "Success", token });
     } catch (err) {
 <span class="cstat-no" title="statement not covered" >        console.error(err);</span>
-<span class="cstat-no" title="statement not covered" >        res.status(500).json({ message: "Server error." });</span>
+<span class="cstat-no" title="statement not covered" >        resp.status(500).json({ message: "Server error." });</span>
     }
 });
 &nbsp;
-app.get('/get-user-id', verifyToken, async (req, res) =&gt; {
-    const email = req.email; // Extracted from the token in `verifyToken` middleware
+app.get('/get-user-id', verifyToken, async (_req, resp) =&gt; {
+    const email = _req.email; // Extracted from the token in `verifyToken` middleware
 &nbsp;
     try {
         const user = await UserModel.findOne({ email: email }).select('_id');
         <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {
-<span class="cstat-no" title="statement not covered" >            return res.status(404).json({ message: "User not found." });</span>
+<span class="cstat-no" title="statement not covered" >            return resp.status(404).json({ message: "User not found." });</span>
         }
 &nbsp;
-        res.json({ userId: user._id });
+        resp.json({ userId: user._id });
     } catch (err) {
 <span class="cstat-no" title="statement not covered" >        console.error(err);</span>
-<span class="cstat-no" title="statement not covered" >        res.status(500).json({ message: "Error fetching user ID." });</span>
+<span class="cstat-no" title="statement not covered" >        resp.status(500).json({ message: "Error fetching user ID." });</span>
     }
 });
 &nbsp;
-app.post('/update-settings', verifyToken, async (req, res) =&gt; {
-    const { userId, settings } = req.body;
+app.post('/update-settings', verifyToken, async (_req, resp) =&gt; {
+    const { userId, settings } = _req.body;
 &nbsp;
     console.log(userId, settings)
 &nbsp;
@@ -434,35 +434,35 @@ app.post('/update-settings', verifyToken, async (req, res) =&gt; {
         }, { new: true });
 &nbsp;
         <span class="missing-if-branch" title="if path not taken" >I</span>if (!updatedUser) {
-<span class="cstat-no" title="statement not covered" >            return res.status(404).json({ message: "User not found." });</span>
+<span class="cstat-no" title="statement not covered" >            return resp.status(404).json({ message: "User not found." });</span>
         }
 &nbsp;
-        res.json({ message: "Settings updated successfully." });
+        resp.json({ message: "Settings updated successfully." });
     } catch (err) {
 <span class="cstat-no" title="statement not covered" >        console.error(err);</span>
-<span class="cstat-no" title="statement not covered" >        res.status(500).json({ message: "Error updating settings." });</span>
+<span class="cstat-no" title="statement not covered" >        resp.status(500).json({ message: "Error updating settings." });</span>
     }
 });
 &nbsp;
-app.get('/get-user-settings', verifyToken, async (req, res) =&gt; {
-    const email = req.email; // Extracted from the token in `verifyToken` middleware
+app.get('/get-user-settings', verifyToken, async (_req, resp) =&gt; {
+    const email = _req.email; // Extracted from the token in `verifyToken` middleware
 &nbsp;
     try {
         const user = await UserModel.findOne({ email: email }, 'settings');
         if (!user) {
-            return res.status(404).json({ message: "User not found." });
+            return resp.status(404).json({ message: "User not found." });
         }
 &nbsp;
-        res.json({ settings: user.settings });
+        resp.json({ settings: user.settings });
     } catch (err) {
 <span class="cstat-no" title="statement not covered" >        console.error(err);</span>
-<span class="cstat-no" title="statement not covered" >        res.status(500).json({ message: "Error fetching user settings." });</span>
+<span class="cstat-no" title="statement not covered" >        resp.status(500).json({ message: "Error fetching user settings." });</span>
     }
 });
 &nbsp;
-app.get('/protected-route', verifyToken, <span class="fstat-no" title="function not covered" >(r</span>eq, res) =&gt; {
+app.get('/protected-route', verifyToken, <span class="fstat-no" title="function not covered" >(_</span>req, resp) =&gt; {
     // This route is now protected, your route logic here
-<span class="cstat-no" title="statement not covered" >    res.json({ message: "This is protected data." });</span>
+<span class="cstat-no" title="statement not covered" >    resp.json({ message: "This is protected data." });</span>
 });
 &nbsp;
 &nbsp;
@@ -478,7 +478,7 @@ module.exports = app;</pre></td></tr></table></pre>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2024-04-11T22:56:57.142Z
+                at 2024-04-12T15:30:19.171Z
             </div>
         <script src="../prettify.js"></script>
         <script>

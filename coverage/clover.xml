@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1712876217164" clover="3.2.0">
-  <project timestamp="1712876217164" name="All files">
+<coverage generated="1712935819201" clover="3.2.0">
+  <project timestamp="1712935819201" name="All files">
     <metrics statements="85" coveredstatements="70" conditionals="18" coveredconditionals="15" methods="8" coveredmethods="6" elements="111" coveredelements="91" complexity="0" loc="85" ncloc="85" packages="2" files="3" classes="3"/>
     <package name="EducationRAGBackendDeploy2">
       <metrics statements="81" coveredstatements="66" conditionals="18" coveredconditionals="15" methods="8" coveredmethods="6"/>
