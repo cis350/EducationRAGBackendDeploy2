@@ -99,7 +99,7 @@ app.post('/logout', async (_req, resp) => {
   // verify the session
   console.log('logout');
   try {
-    const authResp = await verifyToken(_req);
+    const authResp = await verifyToken(_req.headers.authorization);
     if (authResp === 1) { // expired session
       resp.status(403).json({ message: '1 - Session expired already' });
       return;
