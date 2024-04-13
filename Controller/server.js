@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const UserModel = require('../Model/Users');
-const { verifyToken, generateToken } = require('./Utils/auth');
+const { verifyToken, generateToken, blacklistJWT } = require('./Utils/auth');
 
 const app = express();
 app.use(express.json());
@@ -87,6 +87,32 @@ app.post('/login', async (_req, resp) => {
     return resp.json({ message: 'Success', token });
   } catch (err) {
     return resp.status(500).json({ message: 'Server error.' });
+  }
+});
+
+/**
+ * Logout endpoint
+ * use JWT for authentication
+ * Ends the session
+ */
+app.post('/logout', async (_req, resp) => {
+  // verify the session
+  console.log('logout');
+  try {
+    const authResp = await verifyToken(_req);
+    if (authResp === 1) { // expired session
+      resp.status(403).json({ message: 'Session expired already' });
+      return;
+    }
+    if (authResp === 2 || authResp === 3) { // invalid user or jwt
+      resp.status(401).json({ message: 'Invalid user or session' });
+      return;
+    }
+    // session valid blacklist the JWT
+    blacklistJWT(_req.headers.authorization);
+    resp.status(200).json({ message: 'Session terminated' });
+  } catch (err) {
+    resp.status(400).json({ message: 'There was an error' });
   }
 });
 

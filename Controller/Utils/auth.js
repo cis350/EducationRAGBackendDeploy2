@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+// blacklisted tokens
+const jwtBlacklist = new Set();
 
 /**
  * Middleware to verify JWT token in the request authorization header.
@@ -30,12 +32,11 @@ require('dotenv').config();
   return null;
 }*/
 
-function verifyToken(req, res, next) {
+function verifyToken(req) {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN_VALUE
 
-  if (!token) {
-    //return res.status(401).json({ message: 'A token is required for authentication' });
+  if (!token || jwtBlacklist.has(token)) {
     return 3; // invalid token
   }
 
@@ -47,9 +48,8 @@ function verifyToken(req, res, next) {
       // user is undefined
       return 2;
     }
-    next();
+    //next();
     return 0; // token verified -- success
-
   } catch (err) {
     if (err.name === 'TokenExpiredError') {
       console.log('error', err.message);
@@ -72,7 +72,10 @@ function generateToken(email) {
   return jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '5m' });
 }
 
+const blacklistJWT = (token) => jwtBlacklist.add(token);
+
 module.exports = {
   verifyToken,
   generateToken,
+  blacklistJWT,
 };
