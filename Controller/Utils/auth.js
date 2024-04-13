@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const UserModel = require('../../Model/Users');
 // blacklisted tokens
 const jwtBlacklist = new Set();
 
@@ -32,22 +33,28 @@ const jwtBlacklist = new Set();
   return null;
 }*/
 
-function verifyToken(req) {
+//function verifyToken(req) {
+const verifyToken = async (req) => {
   const token = req.headers.authorization;
   //const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN_VALUE
-
-  if (jwtBlacklist.has(token)) {
-    return 4; // invalid token
-  }
-
   try {
+    if (jwtBlacklist.has(token)) {
+      return 4; // invalid token
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     console.log('payload', decoded);
-    req.email = decoded.email;
-    if (!req.email) {
+    const em = decoded.email;
+    const existingUser = await UserModel.findOne({ em });
+    if (!existingUser) {
       // user is undefined
       return 2;
     }
+    /**req.email = decoded.email;
+    if (!req.email) {
+      // user is undefined
+      return 2;
+    }*/
     //next();
     return 0; // token verified -- success
   } catch (err) {
@@ -69,7 +76,15 @@ function verifyToken(req) {
  * @returns {string} - Returns the signed JWT.
  */
 function generateToken(email) {
-  return jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '5m' });
+  //return jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '5m' });
+  try {
+    const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '5m' });
+    console.log('token', token);
+    return token;
+  } catch (err) {
+    console.log('error', err.message);
+    throw err;
+  }
 }
 
 const blacklistJWT = (token) => jwtBlacklist.add(token);
