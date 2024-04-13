@@ -30,16 +30,17 @@ app.get('/', (_req, resp) => {
    */
 app.post('/signup', async (_req, resp) => {
   const { email, password } = _req.body;
-  if (password.length < 8) {
-    return resp.status(400).json({ message: 'Password must be at least 8 characters long.' });
-  }
-  if (!email || password === '') {
-    resp.status(401).json({ error: 'empty or missing username' });
+  
+  if (!email || email === '') {
+    resp.status(401).json({ error: 'empty or missing email' });
     return;
   }
   if (!password || password === '') {
     resp.status(401).json({ error: 'empty or missing password' });
     return;
+  }
+  if (password.length < 8) {
+    return resp.status(400).json({ message: 'Password must be at least 8 characters long.' });
   }
   try {
     const existingUser = await UserModel.findOne({ email });
