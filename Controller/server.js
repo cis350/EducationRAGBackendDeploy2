@@ -101,11 +101,15 @@ app.post('/logout', async (_req, resp) => {
   try {
     const authResp = await verifyToken(_req);
     if (authResp === 1) { // expired session
-      resp.status(403).json({ message: 'Session expired already' });
+      resp.status(403).json({ message: '1 - Session expired already' });
       return;
     }
-    if (authResp === 2 || authResp === 3) { // invalid user or jwt
-      resp.status(401).json({ message: 'Invalid user or session' });
+    if (authResp === 2) {
+      resp.status(401).json({ message: '2 - Invalid user or session' });
+      return;
+    }
+    if (authResp === 3) { // invalid user or jwt
+      resp.status(401).json({ message: '3 - Invalid user or session' });
       return;
     }
     // session valid blacklist the JWT
