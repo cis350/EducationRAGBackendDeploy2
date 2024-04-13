@@ -32,11 +32,11 @@ const jwtBlacklist = new Set();
   return null;
 }*/
 
-function verifyToken(token) {
-  //const authHeader = req.headers.authorization;
+function verifyToken(req) {
+  const token = req.headers.authorization;
   //const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN_VALUE
 
-  if (!token || jwtBlacklist.has(token)) {
+  if (jwtBlacklist.has(token)) {
     return 3; // invalid token
   }
 
