@@ -37,7 +37,7 @@ function verifyToken(req) {
   //const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN_VALUE
 
   if (jwtBlacklist.has(token)) {
-    return 3; // invalid token
+    return 4; // invalid token
   }
 
   try {

@@ -112,6 +112,11 @@ app.post('/logout', async (_req, resp) => {
       resp.status(401).json({ message: '3 - Invalid user or session' });
       return;
     }
+
+    if (authResp === 4) { // invalid user or jwt
+      resp.status(401).json({ message: '4 - Invalid user or session' });
+      return;
+    }
     // session valid blacklist the JWT
     blacklistJWT(_req.headers.authorization);
     resp.status(200).json({ message: 'Session terminated' });
