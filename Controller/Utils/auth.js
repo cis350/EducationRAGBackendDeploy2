@@ -36,12 +36,10 @@ const jwtBlacklist = new Set();
 //function verifyToken(req) {
 const verifyToken = async (req) => {
   const token = req.headers.authorization;
-  //const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN_VALUE
   try {
     if (jwtBlacklist.has(token)) {
       return 4; // invalid token
     }
-
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     console.log('payload', decoded);
     const em = decoded.email;
@@ -66,7 +64,7 @@ const verifyToken = async (req) => {
     console.log('error', err.message);
     return 3;
   }
-}
+};
 
 /**
  * Generates a JWT token for a given email with a specified expiration time.

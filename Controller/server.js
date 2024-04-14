@@ -84,11 +84,12 @@ app.post('/login', async (_req, resp) => {
       return resp.status(401).json({ message: 'The password is incorrect.' });
     }
     //const token = generateToken(user.email);
-    const token = generateToken(email, password);
+    const token = generateToken(email);
     resp.status(201).json({ apptoken: token });
     return resp.json({ message: 'Success', token });
   } catch (err) {
-    return resp.status(500).json({ message: 'Server error.' });
+    console.log('error login', err.message);
+    return resp.status(401).json({ message: 'Server error.' });
   }
 });
 
