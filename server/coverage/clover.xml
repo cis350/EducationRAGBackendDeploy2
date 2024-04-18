@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1713464378638" clover="3.2.0">
-  <project timestamp="1713464378639" name="All files">
+<coverage generated="1713466315205" clover="3.2.0">
+  <project timestamp="1713466315205" name="All files">
     <metrics statements="88" coveredstatements="73" conditionals="26" coveredconditionals="21" methods="9" coveredmethods="7" elements="123" coveredelements="101" complexity="0" loc="88" ncloc="88" packages="3" files="3" classes="3"/>
     <package name="Controller">
       <metrics statements="70" coveredstatements="57" conditionals="22" coveredconditionals="18" methods="7" coveredmethods="5"/>
-      <file name="server.js" path="/Users/neilkapoor/EducationRAGBackendDeploy2/Controller/server.js">
+      <file name="server.js" path="/Users/neilkapoor/EducationRAGBackendDeploy2/server/Controller/server.js">
         <metrics statements="70" coveredstatements="57" conditionals="22" coveredconditionals="18" methods="7" coveredmethods="5"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
@@ -80,7 +80,7 @@
     </package>
     <package name="Controller.Utils">
       <metrics statements="14" coveredstatements="12" conditionals="4" coveredconditionals="3" methods="2" coveredmethods="2"/>
-      <file name="auth.js" path="/Users/neilkapoor/EducationRAGBackendDeploy2/Controller/Utils/auth.js">
+      <file name="auth.js" path="/Users/neilkapoor/EducationRAGBackendDeploy2/server/Controller/Utils/auth.js">
         <metrics statements="14" coveredstatements="12" conditionals="4" coveredconditionals="3" methods="2" coveredmethods="2"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
@@ -100,7 +100,7 @@
     </package>
     <package name="Model">
       <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-      <file name="Users.js" path="/Users/neilkapoor/EducationRAGBackendDeploy2/Model/Users.js">
+      <file name="Users.js" path="/Users/neilkapoor/EducationRAGBackendDeploy2/server/Model/Users.js">
         <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
