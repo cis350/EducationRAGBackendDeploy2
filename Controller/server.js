@@ -47,14 +47,13 @@ app.post('/signup', async (_req, resp) => {
   try {
     const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
-      resp.status(400).json({ message: 'An account with this email already exists.' });
-      return;
+      return resp.status(400).json({ message: 'An account with this email already exists.' });
     }
     const hashedPassword = await bcrypt.hash(password, 12);
     await UserModel.create({ email, password: hashedPassword });
-    resp.status(201).json({ message: 'User created successfully.' });
+    return resp.status(201).json({ message: 'User created successfully.' });
   } catch (err) {
-    resp.status(500).json({ message: 'Error creating user.' });
+    return resp.status(500).json({ message: 'Error creating user.' });
   }
 });
 
@@ -67,31 +66,20 @@ app.post('/signup', async (_req, resp) => {
    */
 app.post('/login', async (_req, resp) => {
   const { email, password } = _req.body;
-
-  if (!email || email === '') {
-    resp.status(401).json({ error: 'empty or missing email' });
-    return;
-  }
-  if (!password || password === '') {
-    resp.status(401).json({ error: 'empty or missing password' });
-    return;
-  }
-
+  
   try {
     const user = await UserModel.findOne({ email });
     if (!user) {
-      resp.status(404).json({ message: 'No account exists with this email.' });
-      return;
+      return resp.status(404).json({ message: 'No account exists with this email.' });
     }
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect) {
-      resp.status(401).json({ message: 'The password is incorrect.' });
-      return;
+      return resp.status(401).json({ message: 'The password is incorrect.' });
     }
     const token = generateToken(user.email);
-    resp.json({ message: 'Success', token });
+    return resp.json({ message: 'Success', token });
   } catch (err) {
-    resp.status(500).json({ message: 'Server error.' });
+    return resp.status(500).json({ message: 'Server error.' });
   }
 });
 
