@@ -1,0 +1,47 @@
+.settings-container {
+    position: fixed; /* Positioned relative to the viewport */
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%); /* Centers the modal */
+    width: 300px; /* Fixed width, you can adjust as necessary */
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Adds a subtle shadow */
+    z-index: 100; /* Ensures the modal appears above other content */
+  }
+  
+  .settings-container h2 {
+    margin-top: 0;
+  }
+  
+  .settings-container label {
+    display: block; /* Makes each control appear on a new line */
+    margin-bottom: 10px;
+  }
+  
+  .settings-container input[type="checkbox"] {
+    margin-right: 10px;
+  }
+  
+  .settings-container select {
+    margin-left: 10px;
+  }
+  
+  .settings-container button {
+    margin-right: 10px; /* Existing margin */
+    cursor: pointer;
+  }
+  
+  .settings-container button:nth-of-type(1) {
+    margin-bottom: 10px; /* Adds space at the bottom of the first button */
+  }
+
+  .settings-container h2 {
+    margin-top: 0;
+    margin-bottom: 20px; /* Adds 20px of space below the heading */
+  }
+
+  .settings-container label:first-of-type {
+    margin-top: 20px; /* Adds 20px of space above the first label */
+  }

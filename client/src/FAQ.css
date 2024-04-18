@@ -1,0 +1,101 @@
+/* General Styles */
+h1, h2, h3, h4, h5, h6 {
+    color: #007bff;
+}
+section {
+    padding: 60px;
+}
+a, a:hover, a:focus, a:active {
+    text-decoration: none;
+    outline: none;
+}
+ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* FAQ Section Styles */
+.faq {
+    padding: 120px 0 90px;
+    background: #f7fbff;
+    min-height: 100vh;
+}
+
+.faq .section-title h2, .faq .section-title h4 {
+    margin-bottom: 22px;
+    text-align: center;
+}
+
+.faq .accordion .card {
+    border: none;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.faq .accordion .card .card-header {
+    background: #fff;
+    border: none;
+    padding: 0;
+}
+
+.faq .accordion .card .card-header h5 {
+    margin-bottom: 0;
+}
+
+.faq .accordion .card .card-header h5 button {
+    width: 100%;
+    text-align: left;
+    padding: 20px;
+    font-size: 18px;
+    color: #1e3056;
+    background-color: #fff;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    position: relative;
+    font-weight: 500;
+}
+
+.faq .accordion .card .card-header h5 button:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+.faq .accordion .card .card-header h5 button::after {
+    content: '+';
+    position: absolute;
+    right: 20px;
+    font-size: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.faq .accordion .card .card-header h5 button.collapsed::after {
+    content: '+';
+}
+
+.faq .accordion .card .card-header h5 button[aria-expanded="true"]::after {
+    content: '-';
+}
+
+.faq .accordion .card .card-body {
+    background: #fff;
+    color: #333;
+    padding: 20px;
+    border-top: none;
+    font-size: 16px;
+    line-height: 1.5;
+    border-radius: 0 0 5px 5px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .faq .accordion .card .card-header h5 button {
+        font-size: 16px;
+        padding: 15px;
+    }
+
+    .faq .accordion .card .card-body {
+        padding: 15px;
+    }
+}
