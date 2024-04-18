@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const UserModel = require('../Model/Users');
-const { verifyToken, generateToken, blacklistJWT } = require('./Utils/auth');
+const { verifyToken, generateToken } = require('./Utils/auth');
 
 const app = express();
 app.use(express.json());
@@ -30,7 +30,7 @@ app.get('/', (_req, resp) => {
    */
 app.post('/signup', async (_req, resp) => {
   const { email, password } = _req.body;
-  
+
   if (!email || email === '') {
     resp.status(401).json({ error: 'empty or missing email' });
     return;
@@ -39,10 +39,11 @@ app.post('/signup', async (_req, resp) => {
     resp.status(401).json({ error: 'empty or missing password' });
     return;
   }
+
   if (password.length < 8) {
-    return resp.status(400).json({ message: 'Password must be at least 8 characters long.' });
+    resp.status(400).json({ message: 'Password must be at least 8 characters long.' });
+    return;
   }
-  
   try {
     const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
@@ -66,15 +67,6 @@ app.post('/signup', async (_req, resp) => {
 app.post('/login', async (_req, resp) => {
   const { email, password } = _req.body;
   
-  if (!email || email === '') {
-    resp.status(401).json({ error: 'empty or missing email' });
-    return;
-  }
-  if (!password || password === '') {
-    resp.status(401).json({ error: 'empty or missing password' });
-    return;
-  }
-  
   try {
     const user = await UserModel.findOne({ email });
     if (!user) {
@@ -84,48 +76,10 @@ app.post('/login', async (_req, resp) => {
     if (!isPasswordCorrect) {
       return resp.status(401).json({ message: 'The password is incorrect.' });
     }
-    //const token = generateToken(user.email);
-    const token = generateToken(email);
-    resp.status(201).json({ apptoken: token });
+    const token = generateToken(user.email);
     return resp.json({ message: 'Success', token });
   } catch (err) {
-    console.log('error login', err.message);
-    return resp.status(401).json({ message: 'Server error.' });
-  }
-});
-
-/**
- * Logout endpoint
- * use JWT for authentication
- * Ends the session
- */
-app.post('/logout', async (_req, resp) => {
-  // verify the session
-  console.log('logout');
-  try {
-    const authResp = await verifyToken(_req);
-    if (authResp === 1) { // expired session
-      resp.status(403).json({ message: '1 - Session expired already' });
-      return;
-    }
-    if (authResp === 2) {
-      resp.status(401).json({ message: '2 - Invalid user or session' });
-      return;
-    }
-    if (authResp === 3) { // invalid user or jwt
-      resp.status(401).json({ message: '3 - Invalid user or session' });
-      return;
-    }
-
-    if (authResp === 4) { // invalid user or jwt
-      resp.status(401).json({ message: '4 - Invalid user or session' });
-      return;
-    }
-    // session valid blacklist the JWT
-    blacklistJWT(_req.headers.authorization);
-    resp.status(200).json({ message: 'Session terminated' });
-  } catch (err) {
-    resp.status(400).json({ message: 'There was an error' });
+    return resp.status(500).json({ message: 'Server error.' });
   }
 });
 
