@@ -2,21 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ChatHistorySidebar from './ChatHistorySidebar'; // Assuming this component exists
 import './Chat.css';
-import axios from 'axios'
-import UserSettings from './UserSettings';
-import { useTheme } from './ThemeContext';
+import UserSettings from '../api/UserSettings';
+import { useTheme } from '../api/ThemeContext';
+import MessageDisplay from './MessageDisplay'; // Ensure this is imported
 
 export default function Chat() {
-  const [newMessageText, setNewMessageText] = useState('');
+  const [selectedChatId, setSelectedChatId] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
   const navigate = useNavigate();
-  const { theme } = useTheme(); // Correctly using theme from context
-
-  const sendMessage = (e) => {
-    e.preventDefault();
-    console.log(newMessageText);
-    setNewMessageText('');
-  };
+  const { theme, setTheme } = useTheme(); // Correctly using theme from context
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -50,7 +44,7 @@ export default function Chat() {
 
 return (
   <div className={`chat-page-container ${theme}-theme`}>
-    <ChatHistorySidebar />
+    <ChatHistorySidebar onSelectChat={setSelectedChatId} selectedChatId={selectedChatId}/>
     <div className="chat-content">
       <header className="chat-header">
         <div className="header-spacer"></div> {/* This div acts as a spacer */}
@@ -61,19 +55,7 @@ return (
         <button onClick={() => setShowSettings(true)} className="settings-button">Settings</button>
         <button onClick={handleLogout} className="logout-button">Logout</button>
       </header>
-      <div className="messages-container">
-        {/* Messages will dynamically be inserted here */}
-      </div>
-      <form onSubmit={sendMessage} className="message-form">
-        <input
-          type="text"
-          className="message-input"
-          value={newMessageText}
-          onChange={(e) => setNewMessageText(e.target.value)}
-          placeholder="Type a message"
-        />
-        <button type="submit" className="send-button">Send</button>
-      </form>
+      {selectedChatId && <MessageDisplay chatId={selectedChatId} />}
     </div>
     {showSettings && <UserSettings onClose={() => setShowSettings(false)} />}
   </div>

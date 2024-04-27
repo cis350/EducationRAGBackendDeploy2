@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import './Signup.css'; // Ensure this CSS file includes styles for .error-message
 import axios from 'axios';
+import React, { useState } from 'react';
+import '../components/Signup.css'; // Ensure this CSS file includes styles for .error-message
+
 
 function Signup() {
     const [email, setEmail] = useState('');

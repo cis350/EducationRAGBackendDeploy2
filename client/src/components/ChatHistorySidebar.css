@@ -11,6 +11,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-bottom: 10px;
 }
 
 .light-theme .chat-history-sidebar {
@@ -29,7 +30,7 @@
   display: flex; /* Make the button a Flex container */
   justify-content: center; /* Center content horizontally */
   align-items: center; /* Center content vertically */
-  background-color: #4CAF50;
+  background-color: #007bff;
   height: 30px; /* Fixed height for the button */
   color: white;
   padding: 10px 10px;
@@ -59,7 +60,7 @@
 }
 
 .new-chat-button:hover {
-  background-color: #45a049;
+  background-color: #007bff;
 }
 
 .modal {
@@ -110,5 +111,5 @@
 }
 
 .modal-content button:hover {
-  background-color: #45a049;
+  background-color: #007bff;
 }

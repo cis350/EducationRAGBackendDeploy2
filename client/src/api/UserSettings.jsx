@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './UserSettings.css'; // This line imports the CSS styles
+import React, { useState, useEffect } from 'react';
+import '../components/UserSettings.css'; // This line imports the CSS styles
 import { useTheme } from './ThemeContext';
 
 function UserSettings({ onClose }) {

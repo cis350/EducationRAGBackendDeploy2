@@ -1,7 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { ThemeProvider } from './ThemeContext';
-import Signup from './Signup';
-import Login from './Login';
+import { ThemeProvider } from '../api/ThemeContext';
+import Signup from '../api/Signup';
+import Login from '../api/Login';
 import Chat from './Chat';
 import ProtectedRoute from './ProtectedRoute'; // Import ProtectedRoute
 import { BrowserRouter, Routes, Route } from 'react-router-dom';

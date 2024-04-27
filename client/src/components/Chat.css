@@ -83,6 +83,7 @@
   .chat-page-container {
     display: flex;
     height: 100vh;
+    overflow-y: hidden; /* Prevent vertical scrolling */
   }
   
   .chat-content {
@@ -103,7 +104,6 @@
 .light-theme .messages-container {
   flex-grow: 1; /* Allows this container to expand and fill available space */
   overflow-y: auto; /* Enables scrolling for overflow content */
-  padding: 10px;
   background-color: #fff; /* White background */
   margin-bottom: auto; /* Pushes anything after it to the bottom */
 }
@@ -159,3 +159,8 @@
     cursor: pointer;
     max-width: 100px; /* Optional: to prevent the button from becoming too wide */
   }
+
+  .dark-theme .chat-content {
+    background-color: #333; /* Dark theme background color */
+  }
+  

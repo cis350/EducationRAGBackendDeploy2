@@ -4,6 +4,7 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const UserModel = require('../Model/Users');
 const { verifyToken, generateToken } = require('./Utils/auth');
+const ChatModel = require('../Model/Chat');
 
 const app = express();
 app.use(express.json());
@@ -155,6 +156,124 @@ app.get('/get-user-settings', verifyToken, async (_req, resp) => {
    */
 app.get('/protected-route', verifyToken, (_req, resp) => {
   resp.json({ message: 'This is protected data.' });
+});
+
+// Message POST
+
+app.post('/send-message', verifyToken, async (req, res) => {
+  const { chatId, message, isUserMessage } = req.body;
+  const userEmail = req.email;
+
+  if (!message) {
+    return res.status(400).json({ message: 'Message content cannot be empty.' });
+  }
+
+  try {
+    // Update chat with the user's message
+    const chat = await ChatModel.findOneAndUpdate(
+      { chatId: chatId, userEmail: userEmail },
+      {
+        $push: { messages: { message, isUserMessage, createdAt: new Date() } },
+        $set: { lastActivity: new Date() },
+      },
+      { new: true },
+    );
+
+    if (!chat) {
+      return res.status(404).json({ message: 'Chat not found or access denied.' });
+    }
+
+    // Generate a response from the bot
+    const botMessage = {
+      message: "Hello, I'm the CIS 350 TA. How can I assist you today?",
+      isUserMessage: false,
+      createdAt: new Date(),
+    };
+
+    // Append bot's message to the chat
+    await ChatModel.findOneAndUpdate(
+      { chatId: chatId, userEmail: userEmail },
+      {
+        $push: { messages: botMessage },
+        $set: { lastActivity: new Date() },
+      },
+      { new: true },
+    );
+
+    // Send back the updated chat including the bot's response
+    res.status(201).json({ message: 'Message sent successfully.', chat: chat.messages.concat(botMessage) });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error sending message.' });
+  }
+});
+
+// Fetch messages for a chat
+app.get('/fetch-messages/:chatId', verifyToken, async (req, res) => {
+  const { chatId } = req.params;
+  const userEmail = req.email;
+
+  try {
+    const chat = await ChatModel.findOne({ chatId: chatId, userEmail: userEmail }).populate('userEmail');
+    if (!chat) {
+      return res.status(404).json({ message: 'Chat not found or access denied.' });
+    }
+
+    res.json({ message: 'Messages fetched successfully.', messages: chat.messages });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching messages.' });
+  }
+});
+
+// Create a new chat
+app.post('/api/chats', verifyToken, async (req, res) => {
+  const { chatName } = req.body;
+  const userEmail = req.email;
+
+  try {
+    const newChat = new ChatModel({
+      chatId: new mongoose.Types.ObjectId().toString(),
+      chatName,
+      userEmail,
+      messages: [],
+    });
+    await newChat.save();
+    res.status(201).json(newChat);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error creating new chat.', error: err.message });
+  }
+});
+
+// Fetch all chats
+app.get('/api/chats', verifyToken, async (req, res) => {
+  const userEmail = req.email;
+
+  try {
+    const chats = await ChatModel.find({ userEmail }).select('chatId chatName createdAt');
+    res.json({ chats });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching chats.' });
+  }
+});
+
+// Endpoint to delete a chat
+app.delete('/api/chats/:chatId', verifyToken, async (req, res) => {
+  const { chatId } = req.params;
+  const userEmail = req.email;
+
+  try {
+    const chat = await ChatModel.findOneAndDelete({ chatId: chatId, userEmail: userEmail });
+    if (!chat) {
+      return res.status(404).json({ message: 'Chat not found or access denied.' });
+    }
+    res.json({ message: 'Chat deleted successfully.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error deleting chat.' });
+  }
 });
 
 module.exports = app;
