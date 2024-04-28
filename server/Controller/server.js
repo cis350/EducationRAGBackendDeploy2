@@ -158,8 +158,14 @@ app.get('/protected-route', verifyToken, (_req, resp) => {
   resp.json({ message: 'This is protected data.' });
 });
 
-// Message POST
-
+/**
+ * POST route to send a message to a chat and receive a bot response.
+ * Verifies user token, checks for non-empty message, updates the chat with user's message,
+ * generates a bot response, appends it to chat, and returns the updated chat.
+ * @param {express.Request} req - Express request object, containing chatId, message content, and message origin (user/bot).
+ * @param {express.Response} res - Express response object.
+ * @returns {void} Sends a JSON response with the updated chat messages or an error message.
+ */
 app.post('/send-message', verifyToken, async (req, res) => {
   const { chatId, message, isUserMessage } = req.body;
   const userEmail = req.email;
@@ -208,7 +214,13 @@ app.post('/send-message', verifyToken, async (req, res) => {
   }
 });
 
-// Fetch messages for a chat
+/**
+ * GET route to fetch all messages for a specific chat.
+ * Validates user access to the chat and returns all messages from the specified chat.
+ * @param {express.Request} req - Express request object, containing chatId as a URL parameter.
+ * @param {express.Response} res - Express response object.
+ * @returns {void} Sends a JSON response containing all messages from the chat or an error message.
+ */
 app.get('/fetch-messages/:chatId', verifyToken, async (req, res) => {
   const { chatId } = req.params;
   const userEmail = req.email;
@@ -226,7 +238,13 @@ app.get('/fetch-messages/:chatId', verifyToken, async (req, res) => {
   }
 });
 
-// Create a new chat
+/**
+ * POST route to create a new chat.
+ * Verifies user token, creates a new chat associated with the user, and returns the new chat data.
+ * @param {express.Request} req - Express request object, containing the name of the chat.
+ * @param {express.Response} res - Express response object.
+ * @returns {void} Sends a JSON response with details of the newly created chat or an error message.
+ */
 app.post('/api/chats', verifyToken, async (req, res) => {
   const { chatName } = req.body;
   const userEmail = req.email;
@@ -246,7 +264,13 @@ app.post('/api/chats', verifyToken, async (req, res) => {
   }
 });
 
-// Fetch all chats
+/**
+ * GET route to fetch all chats associated with a user.
+ * Verifies user token and returns all chats linked to the authenticated user.
+ * @param {express.Request} req - Express request object handled by verifyToken middleware.
+ * @param {express.Response} res - Express response object.
+ * @returns {void} Sends a JSON response containing all user's chats or an error message.
+ */
 app.get('/api/chats', verifyToken, async (req, res) => {
   const userEmail = req.email;
 
@@ -259,7 +283,13 @@ app.get('/api/chats', verifyToken, async (req, res) => {
   }
 });
 
-// Endpoint to delete a chat
+/**
+ * DELETE route to remove a specific chat.
+ * Verifies user token and deletes the specified chat if the user is authorized to access it.
+ * @param {express.Request} req - Express request object, containing chatId as a URL parameter.
+ * @param {express.Response} res - Express response object.
+ * @returns {void} Sends a JSON response indicating the deletion status or an error message.
+ */
 app.delete('/api/chats/:chatId', verifyToken, async (req, res) => {
   const { chatId } = req.params;
   const userEmail = req.email;
