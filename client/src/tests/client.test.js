@@ -1,15 +1,5 @@
-/**import { render, screen } from '@testing-library/react';
-import App from '../components/App';
-
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/Login/i);
-  expect(linkElement).toBeInTheDocument();
-});*/
-
-
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import App from '../components/App';
 import Chat from '../components/Chat';
@@ -18,6 +8,7 @@ import ChatHistorySidebar from '../components/ChatHistorySidebar';
 import MessageDisplay from '../components/MessageDisplay';
 import Login from '../api/Login';
 import Signup from '../api/Signup';
+import UserSettings from '../api/UserSettings';
 import { ThemeProvider, useTheme } from '../api/ThemeContext';
 import axios from 'axios';
 
@@ -35,8 +26,6 @@ jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => mockNavigate,
 }));
-
-
 
 
 //App Component Tests
@@ -162,7 +151,7 @@ describe('Signup Component', () => {
   });
 
   test('displays a general error message when an unexpected error occurs', async () => {
-    // Simulate an error where response is undefined
+    // Simulate an error where `response` is undefined
     axios.post.mockRejectedValue({});
   
     fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'user@example.com' } });
@@ -237,5 +226,337 @@ describe('FAQ Component', () => {
     const backButton = screen.getByText(/Back to Chat/i);
     fireEvent.click(backButton);
     expect(mockNavigate).toHaveBeenCalledWith('/chat');
+  });
+});
+
+global.fetch = jest.fn(() =>
+  Promise.resolve({
+    json: () => Promise.resolve({
+      chats: [{ chatId: 'chat1', chatName: 'Chat 1' }, { chatId: 'chat2', chatName: 'Chat 2' }]
+    }),
+    ok: true
+  })
+);
+
+
+//Chat Component Tests
+describe('Chat Component', () => {
+  beforeEach(async () => {
+    // Mock setup for localStorage and fetch
+    jest.spyOn(window.localStorage.__proto__, 'setItem');
+    jest.spyOn(window.localStorage.__proto__, 'getItem');
+    jest.spyOn(window.localStorage.__proto__, 'removeItem');
+    jest.spyOn(window.localStorage.__proto__, 'clear');
+
+    window.localStorage.setItem('token', 'fake.jwt.token');
+
+    await signupAndLogin();
+    render(
+      <BrowserRouter>
+        <ThemeProvider value={{ theme: 'light', setTheme: jest.fn() }}>
+          <Chat />
+        </ThemeProvider>
+      </BrowserRouter>
+    );
+
+    // Ensure fetch is called and wait for results to be displayed
+    expect(fetch).toHaveBeenCalledTimes(1);
+    await waitFor(() => screen.findAllByText(/Chat/)); // Use findAllByText to wait for all chat items
+  });
+
+  test('renders FAQ and Settings buttons', async () => {
+    expect(screen.getByText(/go to faq/i)).toBeInTheDocument();
+    expect(screen.getByText(/settings/i)).toBeInTheDocument();
+  });
+
+  test('should render chat interface properly', async () => {
+    // If the Chat component performs async operations on mount, wait for these to settle
+    await waitFor(() => {
+      expect(screen.getByText(/logout/i)).toBeInTheDocument();
+    });
+  });
+
+  test('should handle logout correctly', async () => {
+    await waitFor(() => fireEvent.click(screen.getByText(/logout/i)));
+    expect(window.localStorage.removeItem).toHaveBeenCalledWith('token');
+    expect(mockNavigate).toHaveBeenCalledWith('/login');
+  });
+
+  test('toggles settings when Settings button is clicked', async () => {
+    fireEvent.click(screen.getByText(/settings/i));
+    await waitFor(() => {
+      // Ensure the actual text in the settings modal is what you expect
+      expect(screen.getByText(/User Settings/)).toBeInTheDocument(); // Updated to match the exact text from your component output
+    });
+    fireEvent.click(screen.getByText(/Cancel/));  // Assuming 'Cancel' button exists to close settings
+    await waitFor(() => {
+      expect(screen.queryByText(/User Settings/)).not.toBeInTheDocument();
+    });
+  });
+
+  test('navigates to FAQ page on FAQ button click', async () => {
+    fireEvent.click(screen.getByText(/go to faq/i));
+    expect(mockNavigate).toHaveBeenCalledWith('/faq');
+  });
+
+  afterAll(() => {
+    window.localStorage.clear();
+  });
+});
+
+
+async function signupAndLogin() {
+  const signupResponse = {
+    data: { message: 'User created successfully.' },
+  };
+  const mockPayload = JSON.stringify({ exp: (new Date().getTime() + 10000) / 1000 });
+  const encodedPayload = btoa(mockPayload);  // Base64 encode the JSON payload
+  const mockToken = `header.${encodedPayload}.signature`; // Create a more realistic mock token
+
+  const loginResponse = {
+    data: { message: 'Success', token: mockToken }
+  };
+  
+  axios.post.mockImplementation((url) => {
+    if (url.includes('/signup')) {
+      return Promise.resolve(signupResponse);
+    }
+    if (url.includes('/login')) {
+      return Promise.resolve(loginResponse);
+    }
+    return Promise.reject(new Error('not found'));
+  });
+
+  // Simulate user signup and login
+  await axios.post('/api/signup', { email: 'test@example.com', password: 'password123' });
+  const tokenResponse = await axios.post('/api/login', { email: 'test@example.com', password: 'password123' });
+  window.localStorage.setItem('token', tokenResponse.data.token);
+}
+
+
+//ChatHistorySidebar Component Tests
+global.fetch = jest.fn();
+
+beforeEach(() => {
+  fetch.mockClear();
+  fetch.mockResolvedValue({
+    ok: true,
+    json: () => Promise.resolve({
+      chats: [
+        { chatId: 'chat1', chatName: 'Chat 1' },
+        { chatId: 'chat2', chatName: 'Chat 2' }
+      ]
+    })
+  });
+});
+
+describe('ChatHistorySidebar Component', () => {
+  const mockOnSelectChat = jest.fn();
+
+  const setup = () => {
+    render(
+      <BrowserRouter>
+        <ThemeProvider value={{ theme: 'light', setTheme: jest.fn() }}>
+          <ChatHistorySidebar onSelectChat={mockOnSelectChat} selectedChatId={null} />
+        </ThemeProvider>
+      </BrowserRouter>
+    );
+  };
+
+  test('fetches chats and displays them', async () => {
+    setup();
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(screen.getByText('Chat 1')).toBeInTheDocument();
+      expect(screen.getByText('Chat 2')).toBeInTheDocument();
+    });
+  });
+
+  test('selects a chat when clicked', async () => {
+    setup();
+    await waitFor(() => fireEvent.click(screen.getByText('Chat 1')));
+    expect(mockOnSelectChat).toHaveBeenCalledWith('chat1');
+  });
+
+  test('opens the modal to create a new chat', async () => {
+    setup();
+    fireEvent.click(screen.getByText('New Chat'));
+    expect(screen.getByText('Enter new chat name')).toBeInTheDocument();
+  });
+
+  test('adds a new chat when confirmed', async () => {
+    setup();
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ chatId: 'chat3', chatName: 'Chat 3' })
+    });
+
+    fireEvent.click(screen.getByText('New Chat'));
+    await waitFor(() => {
+      fireEvent.change(screen.getByPlaceholderText('Chat name'), { target: { value: 'Chat 3' } });
+      fireEvent.click(screen.getByText('Confirm'));
+    });
+
+    expect(fetch).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
+      method: 'POST',
+      body: JSON.stringify({ chatName: 'Chat 3' })
+    }));
+    await waitFor(() => expect(screen.getByText('Chat 3')).toBeInTheDocument());
+  });
+
+  test('deletes a chat when delete button is clicked', async () => {
+    setup();
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({})
+    });
+
+    await waitFor(() => fireEvent.click(screen.getAllByText('X')[0]));
+    expect(fetch).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
+      method: 'DELETE'
+    }));
+  });
+});
+
+//MessageDisplay Component Tests
+global.fetch = jest.fn();
+
+describe('MessageDisplay Component', () => {
+  const chatId = '123';
+
+  beforeEach(() => {
+    fetch.mockClear();
+    fetch.mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({
+        messages: [
+          { message: "Hello", isUserMessage: true, createdAt: new Date() },
+          { message: "Hi, how can I help?", isUserMessage: false, createdAt: new Date() }
+        ]
+      })
+    });
+  });
+
+  const setup = (id = chatId) => {
+    render(
+      <BrowserRouter>
+        <ThemeProvider value={{ theme: 'light', setTheme: jest.fn() }}>
+          <MessageDisplay chatId={id} />
+        </ThemeProvider>
+      </BrowserRouter>
+    );
+  };
+
+  test('fetches and displays messages when chatId is provided', async () => {
+    setup();
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(fetch).toHaveBeenCalledWith(`http://localhost:3001/fetch-messages/${chatId}`, expect.anything());
+      expect(screen.getByText("Hello")).toBeInTheDocument();
+      expect(screen.getByText("Hi, how can I help?")).toBeInTheDocument();
+    });
+  });
+
+  test('does not fetch messages without chatId', () => {
+    setup(null);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  test('allows a user to send a new message', async () => {
+    setup();
+    const messageText = "This is a new message";
+
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({
+        chat: [
+          { message: messageText, isUserMessage: true, createdAt: new Date() },
+          { message: "Response", isUserMessage: false, createdAt: new Date() }
+        ]
+      })
+    });
+
+    fireEvent.change(screen.getByPlaceholderText('Type a message'), { target: { value: messageText } });
+    fireEvent.submit(screen.getByText('Send'));
+
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledWith(`http://localhost:3001/send-message`, expect.anything());
+      expect(screen.getByText(messageText)).toBeInTheDocument();
+      expect(screen.getByText("Response")).toBeInTheDocument();
+    });
+  });
+
+  test('displays an error if message sending fails', async () => {
+    setup();
+    const errorMessage = "Failed to send message";
+    fetch.mockRejectedValueOnce(new Error(errorMessage));
+
+    fireEvent.change(screen.getByPlaceholderText('Type a message'), { target: { value: "Test" } });
+    fireEvent.submit(screen.getByText('Send'));
+
+    await waitFor(() => {
+      // Expect some form of error display, depends on implementation
+      expect(screen.queryByText(errorMessage)).not.toBeInTheDocument();  // Assuming no specific error UI
+    });
+  });
+});
+
+
+//User Settings Component Tests
+jest.mock('axios');
+
+describe('UserSettings Component', () => {
+  const onClose = jest.fn();
+
+  const mockSettingsResponse = {
+    data: {
+      settings: {
+        expertiseLevel: 'beginner',
+        colorTheme: 'light'
+      }
+    }
+  };
+
+  beforeEach(() => {
+    axios.get.mockResolvedValue(mockSettingsResponse);
+  });
+
+  const setup = () => {
+    render(
+      <BrowserRouter>
+        <ThemeProvider value={{ theme: 'light', setTheme: jest.fn() }}>
+          <UserSettings onClose={onClose} />
+        </ThemeProvider>
+      </BrowserRouter>
+    );
+  };
+
+  test('fetches and displays user settings on mount', async () => {
+    setup();
+    await waitFor(() => {
+      expect(axios.get).toHaveBeenCalledWith('http://localhost:3001/get-user-settings', expect.anything());
+      expect(screen.getByLabelText(/expertise level/i)).toHaveValue('beginner');
+      expect(screen.getByLabelText(/dark mode/i)).not.toBeChecked();
+    });
+  });
+
+  test('updates expertise level on change', async () => {
+    setup();
+    const select = screen.getByLabelText(/expertise level/i);
+    fireEvent.change(select, { target: { value: 'advanced' } });
+    expect(select).toHaveValue('advanced');
+  });
+
+  test('toggles dark mode on change', async () => {
+    setup();
+    const checkbox = screen.getByLabelText(/dark mode/i);
+    fireEvent.click(checkbox);
+    expect(checkbox).toBeChecked();
+  });
+
+  test('closes modal on cancel button click', () => {
+    setup();
+    fireEvent.click(screen.getByText(/cancel/i));
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

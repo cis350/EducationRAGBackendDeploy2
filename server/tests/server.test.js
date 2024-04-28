@@ -1,8 +1,9 @@
 const request = require('supertest');
-
+const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const app = require('../Controller/server'); // Assuming your index.js is in the parent directory
 const UserModel = require('../Model/Users');
+const ChatModel = require('../Model/Chat');
 
 test('adds 1 + 2 to equal 3', () => {
   expect(1 + 2).toBe(3);
@@ -158,5 +159,248 @@ describe('User Login', () => {
     afterAll(async () => {
       await UserModel.deleteMany({});
     });
+  });
+});
+
+describe('POST /send-message', () => {
+  const path = '/send-message';
+  let token;  // To hold the auth token for the session
+
+  // Setup user and login before tests
+  beforeAll(async () => {
+    await UserModel.deleteMany({});
+    await ChatModel.deleteMany({});
+
+    // Create a user
+    const userRes = await request(app)
+      .post('/signup')
+      .send({ email: 'chatuser@example.com', password: 'password123' });
+    
+    // Log in to get token
+    const loginRes = await request(app)
+      .post('/login')
+      .send({ email: 'chatuser@example.com', password: 'password123' });
+    token = loginRes.body.token;
+
+    // Create a chat entry
+    await ChatModel.create({
+      chatId: 'validChatId',
+      chatName: 'Test Chat',
+      userEmail: 'chatuser@example.com',
+      messages: []
+    });
+  });
+
+  test('Should successfully send a message', async () => {
+    const messageData = { chatId: 'validChatId', message: 'Hello', isUserMessage: true };
+    const response = await request(app)
+      .post(path)
+      .send(messageData)
+      .set('Authorization', `Bearer ${token}`);
+    expect(response.statusCode).toBe(201);
+    expect(response.body.message).toBe('Message sent successfully.');
+  });
+
+  test('Should return 400 if message content is empty', async () => {
+    const response = await request(app)
+      .post(path)
+      .send({ chatId: 'validChatId', message: '', isUserMessage: true })
+      .set('Authorization', `Bearer ${token}`);
+    expect(response.statusCode).toBe(400);
+    expect(response.body.message).toBe('Message content cannot be empty.');
+  });
+
+  test('Should return 404 if chat not found', async () => {
+    const response = await request(app)
+      .post(path)
+      .send({ chatId: 'nonExistentChatId', message: 'Hello', isUserMessage: true })
+      .set('Authorization', `Bearer ${token}`);
+    expect(response.statusCode).toBe(404);
+    expect(response.body.message).toBe('Chat not found or access denied.');
+  });
+
+  // Clean up after tests
+  afterAll(async () => {
+    await UserModel.deleteMany({});
+    await ChatModel.deleteMany({});
+  });
+});
+
+describe('GET /fetch-messages/:chatId', () => {
+  const path = '/fetch-messages';
+  let token, chatId;
+
+  // Setup user, login, and chat before tests
+  beforeAll(async () => {
+    await UserModel.deleteMany({});
+    await ChatModel.deleteMany({});
+
+    // Create a user
+    const userRes = await request(app)
+      .post('/signup')
+      .send({ email: 'chatuser@example.com', password: 'password123' });
+
+    // Log in to get token
+    const loginRes = await request(app)
+      .post('/login')
+      .send({ email: 'chatuser@example.com', password: 'password123' });
+    token = loginRes.body.token;
+
+    // Create a chat entry
+    const chatRes = await ChatModel.create({
+      chatId: 'validChatId',
+      chatName: 'Test Chat',
+      userEmail: 'chatuser@example.com',
+      messages: [
+        { message: "Hello", isUserMessage: true, createdAt: new Date() },
+        { message: "Hi there!", isUserMessage: false, createdAt: new Date() }
+      ]
+    });
+    chatId = chatRes.chatId;
+  });
+
+  test('Should fetch messages successfully', async () => {
+    const response = await request(app)
+      .get(`${path}/${chatId}`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty('message', 'Messages fetched successfully.');
+    expect(response.body.messages).toHaveLength(2);
+  });
+
+  test('Should return 404 if chat not found', async () => {
+    const response = await request(app)
+      .get(`${path}/nonExistentChatId`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(response.statusCode).toBe(404);
+    expect(response.body).toHaveProperty('message', 'Chat not found or access denied.');
+  });
+
+  // Clean up after tests
+  afterAll(async () => {
+    await UserModel.deleteMany({});
+    await ChatModel.deleteMany({});
+  });
+});
+
+describe('Chat Operations', () => {
+  let token;  // To hold the auth token for the session
+
+  // Setup user and login before tests
+  beforeAll(async () => {
+    await UserModel.deleteMany({});
+    await ChatModel.deleteMany({});
+
+    // Create a user and log in
+    await request(app)
+      .post('/signup')
+      .send({ email: 'chatuser@example.com', password: 'password123' });
+
+    const loginRes = await request(app)
+      .post('/login')
+      .send({ email: 'chatuser@example.com', password: 'password123' });
+    token = loginRes.body.token;
+  });
+
+  // Test creating a new chat
+  describe('POST /api/chats', () => {
+    test('Should successfully create a new chat', async () => {
+      const chatData = { chatName: 'New Chat Room' };
+      const response = await request(app)
+        .post('/api/chats')
+        .send(chatData)
+        .set('Authorization', `Bearer ${token}`);
+      expect(response.statusCode).toBe(201);
+      expect(response.body).toHaveProperty('chatName', 'New Chat Room');
+      expect(response.body).toHaveProperty('userEmail', 'chatuser@example.com');
+      expect(response.body).toHaveProperty('chatId');
+    });
+
+    test('Should handle errors during chat creation', async () => {
+      // Simulate an error by breaking something, e.g., sending invalid data
+      const chatData = { chatName: '' }; // Assuming empty name should fail
+      const response = await request(app)
+        .post('/api/chats')
+        .send(chatData)
+        .set('Authorization', `Bearer ${token}`);
+      expect(response.statusCode).toBe(500);
+    });
+  });
+
+  test('Should fetch all chats for a user', async () => {
+    const response = await request(app)
+        .get('/api/chats')
+        .set('Authorization', `Bearer ${token}`);
+    console.log(response.body);  
+    expect(response.statusCode).toBe(200);
+});
+
+  // Clean up after tests
+  afterAll(async () => {
+    await UserModel.deleteMany({});
+    await ChatModel.deleteMany({});
+  });
+});
+
+describe('DELETE /api/chats/:chatId', () => {
+  let token, chatId;
+
+  // Setup user and chat before tests
+  beforeAll(async () => {
+    await UserModel.deleteMany({});
+    await ChatModel.deleteMany({});
+
+    // Create a user and log in
+    const userRes = await request(app)
+      .post('/signup')
+      .send({ email: 'chatuser@example.com', password: 'password123' });
+
+    const loginRes = await request(app)
+      .post('/login')
+      .send({ email: 'chatuser@example.com', password: 'password123' });
+    token = loginRes.body.token;
+
+    // Create a chat entry
+    const chat = await ChatModel.create({
+      chatId: new mongoose.Types.ObjectId().toString(),
+      chatName: 'Test Chat',
+      userEmail: 'chatuser@example.com',
+      messages: []
+    });
+    chatId = chat.chatId;
+  });
+
+  test('Should successfully delete a chat', async () => {
+    const response = await request(app)
+      .delete(`/api/chats/${chatId}`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toHaveProperty('message', 'Chat deleted successfully.');
+  });
+
+  test('Should return 404 if chat not found', async () => {
+    const response = await request(app)
+      .delete(`/api/chats/nonExistentChatId`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(response.statusCode).toBe(404);
+    expect(response.body).toHaveProperty('message', 'Chat not found or access denied.');
+  });
+
+  test('Should handle server errors', async () => {
+    // Mock an error scenario, such as when database fails
+    jest.spyOn(ChatModel, 'findOneAndDelete').mockRejectedValue(new Error('Database failure'));
+    const response = await request(app)
+      .delete(`/api/chats/${chatId}`)
+      .set('Authorization', `Bearer ${token}`);
+    expect(response.statusCode).toBe(500);
+    expect(response.body).toHaveProperty('message', 'Error deleting chat.');
+    // Restore original function after mock
+    ChatModel.findOneAndDelete.mockRestore();
+  });
+
+  // Clean up after tests
+  afterAll(async () => {
+    await UserModel.deleteMany({});
+    await ChatModel.deleteMany({});
   });
 });
