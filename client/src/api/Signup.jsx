@@ -35,8 +35,9 @@ function Signup() {
                 
             })
             .catch(err => {
-                console.log(err);
-                setError(err.response.data.message || 'An error occurred. Please try again.');
+              console.log(err);
+              const errorMessage = err.response && err.response.data ? err.response.data.message : 'An error occurred. Please try again.';
+              setError(errorMessage);
             })
     };
 
@@ -56,7 +57,7 @@ function Signup() {
                     <label htmlFor="password">Password</label>
                     <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                 </div>
-                <button type="submit">Sign Up</button>
+                <button type="submit" id="someID">Sign Up</button>
                 {error && <div className="error-message">{error}</div>}
                 {successMessage && <div className="success-message">{successMessage}</div>}
                 <p className="login-link">
