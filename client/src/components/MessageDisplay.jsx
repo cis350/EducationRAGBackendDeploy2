@@ -2,6 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useTheme } from '../api/ThemeContext';  // Import the useTheme hook
 import './MessageDisplay.css';
 
+/**
+ * Component to display chat messages and allow users to send new messages.
+ * It fetches messages for a specific chat and handles the sending of new messages.
+ *
+ * @param {Object} props - Component props.
+ * @param {string} props.chatId - The ID of the current chat session.
+ * @returns {JSX.Element} The rendered message display component.
+ */
 const MessageDisplay = ({ chatId }) => {
   const [messages, setMessages] = useState([]);
   const [newMessageText, setNewMessageText] = useState('');

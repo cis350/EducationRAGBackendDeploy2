@@ -12,8 +12,6 @@ import UserSettings from '../api/UserSettings';
 import { ThemeProvider, useTheme } from '../api/ThemeContext';
 import axios from 'axios';
 
-
-
 // Mock axios globally
 jest.mock('axios', () => ({
   post: jest.fn(),

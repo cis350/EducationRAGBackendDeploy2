@@ -7,6 +7,13 @@ import ProtectedRoute from './ProtectedRoute'; // Import ProtectedRoute
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import FAQ from './FAQ'; // Import the FAQ component
 
+
+/**
+ * The main application component that sets up the routing and global theme context.
+ * Includes protected and public routes.
+ * 
+ * @returns {JSX.Element} The application component structured with a theme provider and router.
+ */
 function App() {
   return (
     <div>

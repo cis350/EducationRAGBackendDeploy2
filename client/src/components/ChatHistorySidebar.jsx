@@ -2,6 +2,16 @@ import React, { useState, useEffect } from 'react';
 import './ChatHistorySidebar.css'; // Ensure your CSS file path is correct
 import { useTheme } from '../api/ThemeContext'; // Adjust the path as necessary
 
+
+/**
+ * A sidebar component that displays a list of chat sessions and allows users to manage them.
+ * Users can select, create new, or delete existing chats.
+ * 
+ * @param {object} props - The component props.
+ * @param {function} props.onSelectChat - Handler to set the selected chat ID in parent component.
+ * @param {string|null} props.selectedChatId - The ID of the currently selected chat.
+ * @returns {JSX.Element} The rendered chat history sidebar.
+ */
 const ChatHistorySidebar = ({ onSelectChat, selectedChatId}) => {
   const { theme } = useTheme();
   const [chats, setChats] = useState([]);

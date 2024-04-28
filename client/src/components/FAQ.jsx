@@ -2,7 +2,17 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate hook for navigation
 import './FAQ.css';
 
-// Define a single FAQ item component
+/**
+ * Represents a single FAQ item with expandable/collapsible functionality.
+ *
+ * @param {Object} props - Component properties
+ * @param {string} props.question - The question for the FAQ item
+ * @param {string} props.answer - The answer to the FAQ question
+ * @param {number} props.id - Unique ID for the FAQ item
+ * @param {number|null} props.expanded - ID of the currently expanded FAQ item
+ * @param {Function} props.setExpanded - Function to set the expanded item
+ * @returns {JSX.Element} A FAQ item with clickable question that expands to show the answer
+ */
 const FAQItem = ({ question, answer, id, expanded, setExpanded }) => {
   const handleClick = () => {
     setExpanded(expanded === id ? null : id); // Toggle between expanded and collapsed state

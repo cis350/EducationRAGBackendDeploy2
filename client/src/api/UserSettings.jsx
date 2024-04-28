@@ -3,6 +3,14 @@ import React, { useState, useEffect } from 'react';
 import '../components/UserSettings.css'; // This line imports the CSS styles
 import { useTheme } from './ThemeContext';
 
+/**
+ * Component to manage and update user settings such as expertise level and theme preference.
+ * Fetches the current settings from the server on component mount and provides UI for updating them.
+ * 
+ * @param {object} props - The component props.
+ * @param {Function} props.onClose - A function to call when closing the settings dialog.
+ * @returns {JSX.Element} The rendered component for user settings management.
+ */
 function UserSettings({ onClose }) {
   const [expertiseLevel, setExpertiseLevel] = useState('beginner');
   const [darkMode, setDarkMode] = useState(false);

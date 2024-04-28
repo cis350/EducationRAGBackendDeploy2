@@ -2,7 +2,13 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import '../components/Signup.css'; // Ensure this CSS file includes styles for .error-message
 
-
+/**
+ * Functional component for handling user registration.
+ * Manages user inputs for email, username, and password, and submits these to the server.
+ * Displays messages based on the success or failure of the registration process.
+ * 
+ * @returns {JSX.Element} A sign-up form with fields for email, username, and password.
+ */
 function Signup() {
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');

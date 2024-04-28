@@ -4,7 +4,13 @@ import '../components/Login.css'; // Ensure it contains .error-message styles
 import { useNavigate } from "react-router-dom";
 import { useTheme } from './ThemeContext'; 
 
-
+/**
+ * Functional component for handling user login.
+ * Manages user input for email and password, submits these credentials to the server,
+ * and handles the server response by setting user-specific settings and navigating to the chat page.
+ * 
+ * @returns {JSX.Element} A login form with email and password fields.
+ */
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');

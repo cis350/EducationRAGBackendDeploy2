@@ -6,6 +6,13 @@ import UserSettings from '../api/UserSettings';
 import { useTheme } from '../api/ThemeContext';
 import MessageDisplay from './MessageDisplay'; // Ensure this is imported
 
+
+/**
+ * Main chat component that includes chat history, message display, and user settings.
+ * Manages user authentication and token expiration.
+ * 
+ * @returns {JSX.Element} The chat interface with dynamic theme support.
+ */
 export default function Chat() {
   const [selectedChatId, setSelectedChatId] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
