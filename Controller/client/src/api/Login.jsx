@@ -16,14 +16,14 @@ function Login() {
         e.preventDefault();
         setErrorMessage(''); // Clear previous error messages
     
-        axios.post('http://localhost:3001/login', { email, password })
+        axios.post('http://localhost:3000/login', { email, password })
             .then(result => {
                 if (result.data.message === "Success") {
                     const { token } = result.data;
                     localStorage.setItem('token', token); // Store the token
     
                     // Fetch user settings after successful login
-                    axios.get('http://localhost:3001/get-user-settings', {
+                    axios.get('http://localhost:3000/get-user-settings', {
                       headers: { 'Authorization': `Bearer ${token}` }
                     })
                     .then(settingsResult => {

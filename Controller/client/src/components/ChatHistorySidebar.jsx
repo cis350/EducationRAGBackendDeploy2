@@ -12,7 +12,7 @@ const ChatHistorySidebar = ({ onSelectChat, selectedChatId}) => {
   useEffect(() => {
     const fetchChats = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/chats', {
+        const response = await fetch('http://localhost:3000/api/chats', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`, // Assuming the token is stored in localStorage
           },
@@ -35,7 +35,7 @@ const ChatHistorySidebar = ({ onSelectChat, selectedChatId}) => {
   const handleModalConfirm = async () => {
     if (newChatName.trim()) {
       try {
-        const response = await fetch('http://localhost:3001/api/chats', {
+        const response = await fetch('http://localhost:3000/api/chats', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ const ChatHistorySidebar = ({ onSelectChat, selectedChatId}) => {
 
   const handleDeleteChat = async (chatId) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/chats/${chatId}`, {
+      const response = await fetch(`http://localhost:3000/api/chats/${chatId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

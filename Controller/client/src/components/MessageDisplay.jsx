@@ -12,7 +12,7 @@ const MessageDisplay = ({ chatId }) => {
       if (!chatId) return;
 
       try {
-        const response = await fetch(`http://localhost:3001/fetch-messages/${chatId}`, {
+        const response = await fetch(`http://localhost:3000/fetch-messages/${chatId}`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
         });
         const data = await response.json();
@@ -34,7 +34,7 @@ const MessageDisplay = ({ chatId }) => {
     if (!newMessageText.trim()) return;
   
     try {
-      const response = await fetch(`http://localhost:3001/send-message`, {
+      const response = await fetch(`http://localhost:3000/send-message`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

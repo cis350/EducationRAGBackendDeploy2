@@ -13,7 +13,7 @@ export const ThemeProvider = ({ children }) => {
         const token = localStorage.getItem('token');
         if (token) {
           try {
-            const response = await axios.get('http://localhost:3001/get-user-settings', {
+            const response = await axios.get('http://localhost:3000/get-user-settings', {
               headers: {
                 'Authorization': `Bearer ${token}`,
               },
