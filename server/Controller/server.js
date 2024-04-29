@@ -10,6 +10,13 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// import path to allow express to access local files
+const path = require('path');
+
+// provide the location of the static files 
+// aka React app
+app.use(express.static(path.join(__dirname, './client/dist')));
+
 mongoose.connect('mongodb+srv://madhavpuri100:k8c6gNkdmon2hves@cluster0.hjtbryn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0');
 
 /**
@@ -19,7 +26,8 @@ mongoose.connect('mongodb+srv://madhavpuri100:k8c6gNkdmon2hves@cluster0.hjtbryn.
  * @returns {void} Sends a JSON response with a welcome message.
  */
 app.get('/', (_req, resp) => {
-  resp.json({ message: 'hello CIS3500 friends!!!' });
+  //resp.json({ message: 'hello CIS3500 friends!!!' });
+  resp.sendFile(path.join(__dirname, './client/dist/index.html'));
 });
 
 /**
@@ -304,6 +312,10 @@ app.delete('/api/chats/:chatId', verifyToken, async (req, res) => {
     console.error(err);
     res.status(500).json({ message: 'Error deleting chat.' });
   }
+});
+
+app.get('*', (req, resp) => {
+  resp.sendFile(path.join(__dirname, './client/dist/index.html'));
 });
 
 module.exports = app;
