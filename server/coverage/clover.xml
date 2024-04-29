@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1714328684868" clover="3.2.0">
-  <project timestamp="1714328684868" name="All files">
+<coverage generated="1714416945854" clover="3.2.0">
+  <project timestamp="1714416945854" name="All files">
     <metrics statements="144" coveredstatements="123" conditionals="34" coveredconditionals="29" methods="14" coveredmethods="12" elements="192" coveredelements="164" complexity="0" loc="144" ncloc="144" packages="3" files="4" classes="4"/>
     <package name="Controller">
       <metrics statements="121" coveredstatements="102" conditionals="30" coveredconditionals="26" methods="12" coveredmethods="10"/>
-      <file name="server.js" path="/Users/shivkarnani/Desktop/EducationRAGBackendDeploy2/server/Controller/server.js">
+      <file name="server.js" path="/Users/neilkapoor/Downloads/EducationRAGBackendDeploy2-1/server/Controller/server.js">
         <metrics statements="121" coveredstatements="102" conditionals="30" coveredconditionals="26" methods="12" coveredmethods="10"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
@@ -131,7 +131,7 @@
     </package>
     <package name="Controller.Utils">
       <metrics statements="14" coveredstatements="12" conditionals="4" coveredconditionals="3" methods="2" coveredmethods="2"/>
-      <file name="auth.js" path="/Users/shivkarnani/Desktop/EducationRAGBackendDeploy2/server/Controller/Utils/auth.js">
+      <file name="auth.js" path="/Users/neilkapoor/Downloads/EducationRAGBackendDeploy2-1/server/Controller/Utils/auth.js">
         <metrics statements="14" coveredstatements="12" conditionals="4" coveredconditionals="3" methods="2" coveredmethods="2"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
@@ -151,7 +151,7 @@
     </package>
     <package name="Model">
       <metrics statements="9" coveredstatements="9" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-      <file name="Chat.js" path="/Users/shivkarnani/Desktop/EducationRAGBackendDeploy2/server/Model/Chat.js">
+      <file name="Chat.js" path="/Users/neilkapoor/Downloads/EducationRAGBackendDeploy2-1/server/Model/Chat.js">
         <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
@@ -159,7 +159,7 @@
         <line num="43" count="1" type="stmt"/>
         <line num="44" count="1" type="stmt"/>
       </file>
-      <file name="Users.js" path="/Users/shivkarnani/Desktop/EducationRAGBackendDeploy2/server/Model/Users.js">
+      <file name="Users.js" path="/Users/neilkapoor/Downloads/EducationRAGBackendDeploy2-1/server/Model/Users.js">
         <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>

@@ -1,6 +1,7 @@
 import axios from 'axios'; // Ensure this import statement is complete
 import React, { createContext, useContext, useState, useEffect } from 'react';
 const ThemeContext = createContext();
+import { rootURL } from "./utils";
 
 /**
  * Provides a theme context to the entire application.
@@ -20,7 +21,7 @@ export const ThemeProvider = ({ children }) => {
         const token = localStorage.getItem('token');
         if (token) {
           try {
-            const response = await axios.get('http://localhost:3001/get-user-settings', {
+            const response = await axios.get(`${rootURL}/get-user-settings`, {
               headers: {
                 'Authorization': `Bearer ${token}`,
               },

@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import '../components/UserSettings.css'; // This line imports the CSS styles
 import { useTheme } from './ThemeContext';
+import { rootURL } from "./utils";
 
 /**
  * Component to manage and update user settings such as expertise level and theme preference.
@@ -19,7 +20,7 @@ function UserSettings({ onClose }) {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/get-user-settings', {
+        const response = await axios.get(`${rootURL}/get-user-settings`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
@@ -39,7 +40,7 @@ function UserSettings({ onClose }) {
 
   const getUserId = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/get-user-id', {
+      const response = await axios.get(`${rootURL}/get-user-id`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`, // Assuming the token is stored in localStorage
         },
@@ -64,7 +65,7 @@ function UserSettings({ onClose }) {
     console.log(settings)
 
     try {
-      const response = await fetch('http://localhost:3001/update-settings', {
+      const response = await fetch(`${rootURL}/update-settings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

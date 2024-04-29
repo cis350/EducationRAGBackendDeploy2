@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import '../components/Signup.css'; // Ensure this CSS file includes styles for .error-message
+import { rootURL } from "./utils";
 
 /**
  * Functional component for handling user registration.
@@ -27,7 +28,7 @@ function Signup() {
             return;
         }
 
-        axios.post('http://localhost:3001/signup', { username, email, password })
+        axios.post(`${rootURL}/signup`, { username, email, password })
             .then(result => {
                 console.log(result);
                 if(result.data.message === 'User created successfully.') {
@@ -63,7 +64,7 @@ function Signup() {
                     <label htmlFor="password">Password</label>
                     <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                 </div>
-                <button type="submit" id="someID">Sign Up</button>
+                <button type="submit" id="signup">Sign Up</button>
                 {error && <div className="error-message">{error}</div>}
                 {successMessage && <div className="success-message">{successMessage}</div>}
                 <p className="login-link">

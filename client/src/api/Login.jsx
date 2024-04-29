@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import '../components/Login.css'; // Ensure it contains .error-message styles
 import { useNavigate } from "react-router-dom";
 import { useTheme } from './ThemeContext'; 
+import { rootURL } from "./utils";
 
 /**
  * Functional component for handling user login.
@@ -21,15 +22,15 @@ function Login() {
     const handleSubmit = (e) => {
         e.preventDefault();
         setErrorMessage(''); // Clear previous error messages
-    
-        axios.post('http://localhost:3001/login', { email, password })
+        
+        axios.post(`${rootURL}/login`, { email, password })
             .then(result => {
                 if (result.data.message === "Success") {
                     const { token } = result.data;
                     localStorage.setItem('token', token); // Store the token
     
                     // Fetch user settings after successful login
-                    axios.get('http://localhost:3001/get-user-settings', {
+                    axios.get(`${rootURL}/get-user-settings`, {
                       headers: { 'Authorization': `Bearer ${token}` }
                     })
                     .then(settingsResult => {
