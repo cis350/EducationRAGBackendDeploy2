@@ -19,7 +19,7 @@
     "lint:fix": "eslint . --fix"
   },
   "engines": {
-    "node": "20.x"
+    "node": "20.12.1"
   },
   "keywords": [],
   "author": "",
