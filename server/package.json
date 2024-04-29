@@ -14,8 +14,12 @@
   "scripts": {
     "test": "jest --coverage --runInBand --forceExit",
     "start": "nodemon index.js",
+    "build": "npm install && cd Controller/client && npm install && npm run build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
+  },
+  "engines": {
+    "node": "20.12.1"
   },
   "keywords": [],
   "author": "",
