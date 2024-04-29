@@ -5,13 +5,13 @@ const port = process.env.PORT || 3001;
 //const port = 3001;
 
 // Set the host to listen on all network interfaces
-//const host = '0.0.0.0'; //'127.0.0.1';
+const host = '0.0.0.0'; //'127.0.0.1';
 
 /**
  * Start the server on the specified port and host.
  * @returns {void} Logs the server status to the console.
  */
-const server = webapp.listen(port, (err) => {
+const server = webapp.listen(port, host, (err) => {
   if (err) {
     console.error('Server failed to start:', err);
     return;
