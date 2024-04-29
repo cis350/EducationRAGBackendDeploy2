@@ -329,8 +329,8 @@ describe('Chat Operations', () => {
 
   test('Should fetch all chats for a user', async () => {
     const response = await request(app)
-        .get('/api/chats')
-        .set('Authorization', `Bearer ${token}`);
+      .get('/api/chats')
+      .set('Authorization', `Bearer ${token}`);
     console.log(response.body);  
     expect(response.statusCode).toBe(200);
 });
