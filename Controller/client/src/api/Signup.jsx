@@ -21,7 +21,7 @@ function Signup() {
             return;
         }
 
-        axios.post('http://localhost:3001/signup', { username, email, password })
+        axios.post('http://localhost:3000/signup', { username, email, password })
             .then(result => {
                 console.log(result);
                 if(result.data.message === 'User created successfully.') {
