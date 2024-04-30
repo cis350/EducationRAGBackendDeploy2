@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../api/ThemeContext';  // Import the useTheme hook
 import './MessageDisplay.css';
+import { rootURL } from "./utils";
 
 /**
  * Component to display chat messages and allow users to send new messages.
@@ -20,7 +21,7 @@ const MessageDisplay = ({ chatId }) => {
       if (!chatId) return;
 
       try {
-        const response = await fetch(`http://localhost:3001/fetch-messages/${chatId}`, {
+        const response = await fetch(`${rootURL}/fetch-messages/${chatId}`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
         });
         const data = await response.json();
@@ -42,7 +43,7 @@ const MessageDisplay = ({ chatId }) => {
     if (!newMessageText.trim()) return;
   
     try {
-      const response = await fetch(`http://localhost:3001/send-message`, {
+      const response = await fetch(`${rootURL}/send-message`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

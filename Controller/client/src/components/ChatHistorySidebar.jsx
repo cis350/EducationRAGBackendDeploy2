@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './ChatHistorySidebar.css'; // Ensure your CSS file path is correct
 import { useTheme } from '../api/ThemeContext'; // Adjust the path as necessary
-
+import { rootURL } from "./utils";
 
 /**
  * A sidebar component that displays a list of chat sessions and allows users to manage them.
@@ -22,7 +22,7 @@ const ChatHistorySidebar = ({ onSelectChat, selectedChatId}) => {
   useEffect(() => {
     const fetchChats = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/chats', {
+        const response = await fetch(`${rootURL}/api/chats`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`, // Assuming the token is stored in localStorage
           },
@@ -45,7 +45,7 @@ const ChatHistorySidebar = ({ onSelectChat, selectedChatId}) => {
   const handleModalConfirm = async () => {
     if (newChatName.trim()) {
       try {
-        const response = await fetch('http://localhost:3001/api/chats', {
+        const response = await fetch(`${rootURL}/api/chats`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ const ChatHistorySidebar = ({ onSelectChat, selectedChatId}) => {
 
   const handleDeleteChat = async (chatId) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/chats/${chatId}`, {
+      const response = await fetch(`${rootURL}/api/chats/${chatId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

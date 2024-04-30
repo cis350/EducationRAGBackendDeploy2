@@ -11,6 +11,7 @@ import Signup from '../api/Signup';
 import UserSettings from '../api/UserSettings';
 import { ThemeProvider, useTheme } from '../api/ThemeContext';
 import axios from 'axios';
+import { rootURL } from "./utils";
 
 // Mock axios globally
 jest.mock('axios', () => ({
@@ -449,7 +450,7 @@ describe('MessageDisplay Component', () => {
     setup();
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledTimes(1);
-      expect(fetch).toHaveBeenCalledWith(`http://localhost:3001/fetch-messages/${chatId}`, expect.anything());
+      expect(fetch).toHaveBeenCalledWith(`${rootURL}/fetch-messages/${chatId}`, expect.anything());
       expect(screen.getByText("Hello")).toBeInTheDocument();
       expect(screen.getByText("Hi, how can I help?")).toBeInTheDocument();
     });
@@ -478,7 +479,7 @@ describe('MessageDisplay Component', () => {
     fireEvent.submit(screen.getByText('Send'));
 
     await waitFor(() => {
-      expect(fetch).toHaveBeenCalledWith(`http://localhost:3001/send-message`, expect.anything());
+      expect(fetch).toHaveBeenCalledWith(`${rootURL}/send-message`, expect.anything());
       expect(screen.getByText(messageText)).toBeInTheDocument();
       expect(screen.getByText("Response")).toBeInTheDocument();
     });
@@ -532,7 +533,7 @@ describe('UserSettings Component', () => {
   test('fetches and displays user settings on mount', async () => {
     setup();
     await waitFor(() => {
-      expect(axios.get).toHaveBeenCalledWith('http://localhost:3001/get-user-settings', expect.anything());
+      expect(axios.get).toHaveBeenCalledWith(`${rootURL}/get-user-settings`, expect.anything());
       expect(screen.getByLabelText(/expertise level/i)).toHaveValue('beginner');
       expect(screen.getByLabelText(/dark mode/i)).not.toBeChecked();
     });
