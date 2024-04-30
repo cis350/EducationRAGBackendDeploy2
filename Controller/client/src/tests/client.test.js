@@ -1,5 +1,4 @@
-import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import App from '../components/App';
 import Chat from '../components/Chat';
@@ -9,7 +8,7 @@ import MessageDisplay from '../components/MessageDisplay';
 import Login from '../api/Login';
 import Signup from '../api/Signup';
 import UserSettings from '../api/UserSettings';
-import { ThemeProvider, useTheme } from '../api/ThemeContext';
+import { ThemeProvider } from '../api/ThemeContext';
 import axios from 'axios';
 import { rootURL } from "./utils";
 
@@ -189,7 +188,7 @@ describe('FAQ Component', () => {
         <FAQ />
       </BrowserRouter>
     );
-    const questions = screen.getAllByText(/CIS-3500|AI chatbot|free to use|interact with the AI chatbot|specific coding problems/i);
+    //const questions = screen.getAllByText(/CIS-3500|AI chatbot|free to use|interact with the AI chatbot|specific coding problems/i);
   });
 
   test('expands and collapses FAQ items', async () => {

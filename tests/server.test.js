@@ -164,7 +164,7 @@ describe('User Login', () => {
 
 describe('POST /send-message', () => {
   const path = '/send-message';
-  let token;  // To hold the auth token for the session
+  let token; // To hold the auth token for the session
 
   // Setup user and login before tests
   beforeAll(async () => {
@@ -175,7 +175,7 @@ describe('POST /send-message', () => {
     const userRes = await request(app)
       .post('/signup')
       .send({ email: 'chatuser@example.com', password: 'password123' });
-    
+
     // Log in to get token
     const loginRes = await request(app)
       .post('/login')
@@ -187,7 +187,7 @@ describe('POST /send-message', () => {
       chatId: 'validChatId',
       chatName: 'Test Chat',
       userEmail: 'chatuser@example.com',
-      messages: []
+      messages: [],
     });
   });
 
@@ -228,7 +228,8 @@ describe('POST /send-message', () => {
 
 describe('GET /fetch-messages/:chatId', () => {
   const path = '/fetch-messages';
-  let token, chatId;
+  let token; let
+    chatId;
 
   // Setup user, login, and chat before tests
   beforeAll(async () => {
@@ -252,9 +253,9 @@ describe('GET /fetch-messages/:chatId', () => {
       chatName: 'Test Chat',
       userEmail: 'chatuser@example.com',
       messages: [
-        { message: "Hello", isUserMessage: true, createdAt: new Date() },
-        { message: "Hi there!", isUserMessage: false, createdAt: new Date() }
-      ]
+        { message: 'Hello', isUserMessage: true, createdAt: new Date() },
+        { message: 'Hi there!', isUserMessage: false, createdAt: new Date() },
+      ],
     });
     chatId = chatRes.chatId;
   });
@@ -284,7 +285,7 @@ describe('GET /fetch-messages/:chatId', () => {
 });
 
 describe('Chat Operations', () => {
-  let token;  // To hold the auth token for the session
+  let token; // To hold the auth token for the session
 
   // Setup user and login before tests
   beforeAll(async () => {
@@ -329,11 +330,11 @@ describe('Chat Operations', () => {
 
   test('Should fetch all chats for a user', async () => {
     const response = await request(app)
-        .get('/api/chats')
-        .set('Authorization', `Bearer ${token}`);
-    console.log(response.body);  
+      .get('/api/chats')
+      .set('Authorization', `Bearer ${token}`);
+    console.log(response.body);
     expect(response.statusCode).toBe(200);
-});
+  });
 
   // Clean up after tests
   afterAll(async () => {
@@ -343,7 +344,8 @@ describe('Chat Operations', () => {
 });
 
 describe('DELETE /api/chats/:chatId', () => {
-  let token, chatId;
+  let token; let
+    chatId;
 
   // Setup user and chat before tests
   beforeAll(async () => {
@@ -365,7 +367,7 @@ describe('DELETE /api/chats/:chatId', () => {
       chatId: new mongoose.Types.ObjectId().toString(),
       chatName: 'Test Chat',
       userEmail: 'chatuser@example.com',
-      messages: []
+      messages: [],
     });
     chatId = chat.chatId;
   });
@@ -380,7 +382,7 @@ describe('DELETE /api/chats/:chatId', () => {
 
   test('Should return 404 if chat not found', async () => {
     const response = await request(app)
-      .delete(`/api/chats/nonExistentChatId`)
+      .delete('/api/chats/nonExistentChatId')
       .set('Authorization', `Bearer ${token}`);
     expect(response.statusCode).toBe(404);
     expect(response.body).toHaveProperty('message', 'Chat not found or access denied.');

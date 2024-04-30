@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
+const path = require('path');
 const UserModel = require('../Model/Users');
 const { verifyToken, generateToken } = require('./Utils/auth');
 const ChatModel = require('../Model/Chat');
@@ -11,9 +12,8 @@ app.use(express.json());
 app.use(cors());
 
 // import path to allow express to access local files
-const path = require('path');
 
-// provide the location of the static files 
+// provide the location of the static files
 // aka React app
 app.use(express.static(path.join(__dirname, './client/dist')));
 
@@ -26,7 +26,7 @@ mongoose.connect('mongodb+srv://madhavpuri100:k8c6gNkdmon2hves@cluster0.hjtbryn.
  * @returns {void} Sends a JSON response with a welcome message.
  */
 app.get('/', (_req, resp) => {
-  //resp.json({ message: 'hello CIS3500 friends!!!' });
+  // resp.json({ message: 'hello CIS3500 friends!!!' });
   resp.sendFile(path.join(__dirname, './client/dist/index.html'));
 });
 
@@ -75,7 +75,7 @@ app.post('/signup', async (_req, resp) => {
    */
 app.post('/login', async (_req, resp) => {
   const { email, password } = _req.body;
-  
+
   try {
     const user = await UserModel.findOne({ email });
     if (!user) {
@@ -170,7 +170,8 @@ app.get('/protected-route', verifyToken, (_req, resp) => {
  * POST route to send a message to a chat and receive a bot response.
  * Verifies user token, checks for non-empty message, updates the chat with user's message,
  * generates a bot response, appends it to chat, and returns the updated chat.
- * @param {express.Request} req - Express request object, containing chatId, message content, and message origin (user/bot).
+ * @param {express.Request} req - Express request object, containing chatId, 
+ * message content, and message origin (user/bot).
  * @param {express.Response} res - Express response object.
  * @returns {void} Sends a JSON response with the updated chat messages or an error message.
  */
@@ -185,7 +186,7 @@ app.post('/send-message', verifyToken, async (req, res) => {
   try {
     // Update chat with the user's message
     const chat = await ChatModel.findOneAndUpdate(
-      { chatId: chatId, userEmail: userEmail },
+      { chatId, userEmail },
       {
         $push: { messages: { message, isUserMessage, createdAt: new Date() } },
         $set: { lastActivity: new Date() },
@@ -206,7 +207,7 @@ app.post('/send-message', verifyToken, async (req, res) => {
 
     // Append bot's message to the chat
     await ChatModel.findOneAndUpdate(
-      { chatId: chatId, userEmail: userEmail },
+      { chatId, userEmail },
       {
         $push: { messages: botMessage },
         $set: { lastActivity: new Date() },
@@ -217,7 +218,7 @@ app.post('/send-message', verifyToken, async (req, res) => {
     // Send back the updated chat including the bot's response
     res.status(201).json({ message: 'Message sent successfully.', chat: chat.messages.concat(botMessage) });
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     res.status(500).json({ message: 'Error sending message.' });
   }
 });
@@ -234,14 +235,14 @@ app.get('/fetch-messages/:chatId', verifyToken, async (req, res) => {
   const userEmail = req.email;
 
   try {
-    const chat = await ChatModel.findOne({ chatId: chatId, userEmail: userEmail }).populate('userEmail');
+    const chat = await ChatModel.findOne({ chatId, userEmail }).populate('userEmail');
     if (!chat) {
       return res.status(404).json({ message: 'Chat not found or access denied.' });
     }
 
     res.json({ message: 'Messages fetched successfully.', messages: chat.messages });
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     res.status(500).json({ message: 'Error fetching messages.' });
   }
 });
@@ -267,7 +268,7 @@ app.post('/api/chats', verifyToken, async (req, res) => {
     await newChat.save();
     res.status(201).json(newChat);
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     res.status(500).json({ message: 'Error creating new chat.', error: err.message });
   }
 });
@@ -286,7 +287,7 @@ app.get('/api/chats', verifyToken, async (req, res) => {
     const chats = await ChatModel.find({ userEmail }).select('chatId chatName createdAt');
     res.json({ chats });
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     res.status(500).json({ message: 'Error fetching chats.' });
   }
 });
@@ -303,13 +304,13 @@ app.delete('/api/chats/:chatId', verifyToken, async (req, res) => {
   const userEmail = req.email;
 
   try {
-    const chat = await ChatModel.findOneAndDelete({ chatId: chatId, userEmail: userEmail });
+    const chat = await ChatModel.findOneAndDelete({ chatId, userEmail });
     if (!chat) {
       return res.status(404).json({ message: 'Chat not found or access denied.' });
     }
     res.json({ message: 'Chat deleted successfully.' });
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     res.status(500).json({ message: 'Error deleting chat.' });
   }
 });
