@@ -1,0 +1,1 @@
+export const rootURL = ''; //'http://localhost:3001'; //"https://education-rag-6f6c688e8b93.herokuapp.com/" //'http://localhost:3001';
