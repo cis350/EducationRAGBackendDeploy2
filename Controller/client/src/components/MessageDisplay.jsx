@@ -42,6 +42,17 @@ const MessageDisplay = ({ chatId }) => {
     e.preventDefault();
     if (!newMessageText.trim()) return;
   
+    // Display the user's message immediately in the UI
+    const userMessage = {
+      message: newMessageText,
+      isUserMessage: true,
+      createdAt: new Date().toISOString(), // Capture the current timestamp
+    };
+  
+    // Optimistically update the UI with the user's message
+    setMessages([...messages, userMessage]);
+    setNewMessageText('');
+  
     try {
       const response = await fetch(`${rootURL}/send-message`, {
         method: 'POST',
@@ -51,22 +62,23 @@ const MessageDisplay = ({ chatId }) => {
         },
         body: JSON.stringify({
           chatId: chatId,
-          message: newMessageText,
+          message: userMessage.message,
           isUserMessage: true
         })
       });
       const data = await response.json();
       if (response.ok) {
-        // Combine the user's message and the bot's response
-        const updatedMessages = [...messages, data.chat[data.chat.length - 2], data.chat[data.chat.length - 1]];
-        setMessages(updatedMessages);
-        setNewMessageText('');
+        // Assume the last message in the response array is the bot's response
+        // and update messages to include the bot's response
+        const botResponse = data.chat[data.chat.length - 1];
+        setMessages(prevMessages => [...prevMessages, botResponse]);
       } else {
         throw new Error(data.message || "Failed to send message");
       }
     } catch (error) {
       console.error('Error sending message:', error);
-      // Optional: Notify the user that an error occurred
+      // Optionally handle state rollback or alert the user
+      setMessages(messages.filter(msg => msg !== userMessage)); // Remove optimistic message on failure
     }
   };
 
