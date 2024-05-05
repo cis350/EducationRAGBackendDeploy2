@@ -172,7 +172,7 @@ describe('POST /send-message', () => {
     await ChatModel.deleteMany({});
 
     // Create a user
-    const userRes = await request(app)
+    await request(app)
       .post('/signup')
       .send({ email: 'chatuser@example.com', password: 'password123' });
 
