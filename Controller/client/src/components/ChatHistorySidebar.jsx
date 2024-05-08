@@ -109,7 +109,7 @@ const ChatHistorySidebar = ({ onSelectChat, selectedChatId}) => {
     <div className={`chat-history-sidebar ${theme}-theme`}>
       <div className="header">
         <h3>EduRAG</h3>
-        <button className="new-chat-button" id="newChat" onClick={handleNewChat}>New Chat</button>
+        <button className="new-chat-button" onClick={handleNewChat}>New Chat</button>
       </div>
       <ul>
         {chats.map((chat, index) => (

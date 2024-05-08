@@ -1,7 +1,7 @@
 describe('our first E2E test', () => {
   it('test signup flow', () => {
-    //cy.visit('http://localhost:3001/signup')
-    cy.visit('https://education-rag-6f6c688e8b93.herokuapp.com/signup')
+    cy.visit('http://localhost:3001/signup')
+    //cy.visit('https://education-rag-6f6c688e8b93.herokuapp.com/signup')
     //cy.get('#email').type('abcde@gmail.com')
     //cy.get('#username').type('abc')
     //cy.get('#password').type('abcdefghijk')
@@ -23,8 +23,8 @@ describe('our first E2E test', () => {
   })
   
   it('Testing login flow', () => {
-    //cy.visit('http://localhost:3001/login')
-    cy.visit('https://education-rag-6f6c688e8b93.herokuapp.com/login')
+    cy.visit('http://localhost:3001/login')
+    //cy.visit('https://education-rag-6f6c688e8b93.herokuapp.com/login')
     //cy.get('#email').type('abcde@gmail.com')
     //cy.get('#password').type('abcdefghijk')
     
@@ -35,7 +35,7 @@ describe('our first E2E test', () => {
     cy.contains('button', 'Settings').click()
     cy.contains('button', 'Go to FAQ').click()
     cy.contains('button', 'Back to Chat').click()
-    cy.contains('button', 'New Chat').click()
+    cy.contains('button', 'New Chat').click({force: true})
     cy.contains('button', 'Cancel').click()
     cy.contains('button', 'Logout').click()
     //cy.get('button').contains('Logout')
@@ -43,8 +43,8 @@ describe('our first E2E test', () => {
   })
 
   it('Testing chat', () => {
-    //cy.visit('http://localhost:3001/login')
-    cy.visit('https://education-rag-6f6c688e8b93.herokuapp.com/login')
+    cy.visit('http://localhost:3001/login')
+    //cy.visit('https://education-rag-6f6c688e8b93.herokuapp.com/login')
     //cy.get('#email').type('abcde@gmail.com')
     //cy.get('#password').type('abcdefghijk')
     
@@ -55,17 +55,19 @@ describe('our first E2E test', () => {
     cy.contains('button', 'Settings').click()
     cy.contains('button', 'Go to FAQ').click()
     cy.contains('button', 'Back to Chat').click()
-    cy.contains('button', 'New Chat').click()
+    cy.contains('button', 'New Chat').click({force: true})
     cy.get('input[type="text"]').type('chat2')
     cy.contains('button', 'Confirm').click()
 
     cy.contains('button', 'chat2').click()
 
-    cy.get('input[type="text"]').type('Can you help me with CIS 121?')
+    cy.get('input[type="text"]').type('Can you help me with CIS 121?')    
     cy.contains('button', 'Send').click()
+    cy.wait(3000);
 
     cy.get('input[type="text"]').type('What is a trie?')
     cy.contains('button', 'Send').click()
+    cy.wait(3000);
 
     cy.contains('button', 'Go to FAQ').click()
     cy.contains('button', 'Back to Chat').click()
