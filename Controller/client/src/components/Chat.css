@@ -87,6 +87,7 @@
   }
   
   .chat-content {
+  max-width: 85%;
   flex-grow: 1; /* Take up the remaining width */
   display: flex;
   flex-direction: column;
@@ -94,6 +95,7 @@
 }
 
 .dark-theme .messages-container {
+  max-width: 80%;
   flex-grow: 1; /* Allows this container to expand and fill available space */
   overflow-y: auto; /* Enables scrolling for overflow content */
   padding: 10px;
@@ -102,6 +104,7 @@
 }
 
 .light-theme .messages-container {
+  max-width: 80%;
   flex-grow: 1; /* Allows this container to expand and fill available space */
   overflow-y: auto; /* Enables scrolling for overflow content */
   background-color: #fff; /* White background */
@@ -161,6 +164,7 @@
   }
 
   .dark-theme .chat-content {
+    max-width: 85%;
     background-color: #333; /* Dark theme background color */
   }
   

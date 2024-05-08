@@ -128,6 +128,7 @@ const ChatHistorySidebar = ({ onSelectChat, selectedChatId}) => {
             </button>
             <button
               onClick={() => handleDeleteChat(chat.chatId)}
+              id="deleteChat"
               style={{
                 backgroundColor: 'red',
                 color: 'white',

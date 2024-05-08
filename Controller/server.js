@@ -6,14 +6,58 @@ const path = require('path');
 const UserModel = require('../Model/Users');
 const { verifyToken, generateToken } = require('./Utils/auth');
 const ChatModel = require('../Model/Chat');
+require('dotenv').config();
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-// import path to allow express to access local files
+const OpenAI = require('openai');
 
-// provide the location of the static files
+// Create a new OpenAI client instance using your API key
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+async function generateChatResponse(messages, userId) {
+  try {
+    // Retrieve user settings from the database based on userId
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      console.error('User not found');
+      return null; // Handle user not found error
+    }
+
+    // Extract expertise level from user settings
+    const expertiseLevel = user.settings.expertiseLevel;
+
+    // System prompt based on the expertise level
+    let systemPrompt = `Explain as if talking to a ${expertiseLevel} level user:`;
+    const prompts = messages.map(msg => ({
+      role: msg.role,
+      content: msg.content
+    }));
+
+    // Insert the system instruction as the first message
+    prompts.unshift({
+      role: "system",
+      content: systemPrompt
+    });
+
+    // Call the OpenAI API with the modified prompt list
+    const chatCompletion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: prompts
+    });
+
+    // Prepend the response with the expertise level for clarity
+    return `[${expertiseLevel} level answer] ${chatCompletion.choices[0].message.content}`;
+  } catch (error) {
+    console.error('Failed to create chat completion:', error);
+    return null;  // Handle error appropriately
+  }
+}
+
 // aka React app
 app.use(express.static(path.join(__dirname, './client/dist')));
 
@@ -31,7 +75,7 @@ app.get('/', (_req, resp) => {
 });
 
 /**
-   * Route for user registration.
+   * Route for user registration.`
    * Checks password length, existence of the user, hashes the password and creates a user.
    * @param {express.Request} _req - Express request object containing email and password.
    * @param {express.Response} resp - Express response object.
@@ -177,51 +221,50 @@ app.get('/protected-route', verifyToken, (_req, resp) => {
  */
 app.post('/send-message', verifyToken, async (req, res) => {
   const { chatId, message, isUserMessage } = req.body;
-  const userEmail = req.email;
-
-  if (!message) {
-    return res.status(400).json({ message: 'Message content cannot be empty.' });
-  }
+  const userEmail = req.email; // or req.userId based on your token decoding
 
   try {
-    // Update chat with the user's message
-    const chat = await ChatModel.findOneAndUpdate(
-      { chatId, userEmail },
-      {
-        $push: { messages: { message, isUserMessage, createdAt: new Date() } },
-        $set: { lastActivity: new Date() },
-      },
-      { new: true },
-    );
+    const user = await UserModel.findOne({ email: userEmail });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
 
+    let chat = await ChatModel.findOne({ chatId, 'userEmail': userEmail });
     if (!chat) {
       return res.status(404).json({ message: 'Chat not found or access denied.' });
     }
 
-    // Generate a response from the bot
+    const messagesForAI = chat.messages.map(msg => ({
+      role: msg.isUserMessage ? 'user' : 'assistant',
+      content: msg.message
+    }));
+    messagesForAI.push({ role: 'user', content: message });
+
+    const aiResponse = await generateChatResponse(messagesForAI, user._id);
+    if (!aiResponse) {
+      return res.status(500).json({ message: 'AI failed to generate a response.' });
+    }
+
     const botMessage = {
-      message: "Hello, I'm the CIS 350 TA. How can I assist you today?",
+      message: aiResponse,
       isUserMessage: false,
       createdAt: new Date(),
     };
 
-    // Append bot's message to the chat
-    await ChatModel.findOneAndUpdate(
+    chat = await ChatModel.findOneAndUpdate(
       { chatId, userEmail },
-      {
-        $push: { messages: botMessage },
-        $set: { lastActivity: new Date() },
-      },
-      { new: true },
+      { $push: { messages: [{ message, isUserMessage, createdAt: new Date() }, botMessage] },
+        $set: { lastActivity: new Date() } },
+      { new: true }
     );
 
-    // Send back the updated chat including the bot's response
-    res.status(201).json({ message: 'Message sent successfully.', chat: chat.messages.concat(botMessage) });
+    res.status(201).json({ message: 'Message sent successfully.', chat: chat.messages });
   } catch (err) {
-    // console.error(err);
+    console.error('Error sending message:', err);
     res.status(500).json({ message: 'Error sending message.' });
   }
 });
+
 
 /**
  * GET route to fetch all messages for a specific chat.

@@ -436,7 +436,7 @@ describe('MessageDisplay Component', () => {
   });
 
   const setup = (id = chatId) => {
-    render(
+    return render(
       <BrowserRouter>
         <ThemeProvider value={{ theme: 'light', setTheme: jest.fn() }}>
           <MessageDisplay chatId={id} />
@@ -463,7 +463,7 @@ describe('MessageDisplay Component', () => {
   test('allows a user to send a new message', async () => {
     setup();
     const messageText = "This is a new message";
-
+  
     fetch.mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve({
@@ -473,15 +473,16 @@ describe('MessageDisplay Component', () => {
         ]
       })
     });
-
+  
     fireEvent.change(screen.getByPlaceholderText('Type a message'), { target: { value: messageText } });
     fireEvent.submit(screen.getByText('Send'));
-
+  
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith(`${rootURL}/send-message`, expect.anything());
-      expect(screen.getByText(messageText)).toBeInTheDocument();
-      expect(screen.getByText("Response")).toBeInTheDocument();
     });
+    
+    expect(await screen.findByText(messageText)).toBeInTheDocument();
+    expect(await screen.findByText("Response")).toBeInTheDocument();
   });
 
   test('displays an error if message sending fails', async () => {
@@ -495,6 +496,61 @@ describe('MessageDisplay Component', () => {
     await waitFor(() => {
       // Expect some form of error display, depends on implementation
       expect(screen.queryByText(errorMessage)).not.toBeInTheDocument();  // Assuming no specific error UI
+    });
+  });
+  
+  test('clears the input field and shows optimistic UI update after sending a message', async () => {
+    setup();
+    const messageText = "Test message";
+    fireEvent.change(screen.getByPlaceholderText('Type a message'), { target: { value: messageText } });
+    fireEvent.submit(screen.getByText('Send'));
+  
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText('Type a message').value).toBe('');
+    });
+  
+    // Assuming optimistic UI updates
+    expect(screen.getByText(messageText)).toBeInTheDocument();
+  });
+
+  test('fetches new messages when chatId changes', async () => {
+    const { rerender } = setup('chat-id-1');
+    
+    // Initial fetch for first chatId
+    expect(fetch).toHaveBeenCalledWith(`${rootURL}/fetch-messages/chat-id-1`, expect.anything());
+  
+    // Change chatId and re-render the component
+    rerender(
+      <BrowserRouter>
+        <ThemeProvider value={{ theme: 'light', setTheme: jest.fn() }}>
+          <MessageDisplay chatId="chat-id-2" />
+        </ThemeProvider>
+      </BrowserRouter>
+    );
+  
+    // Check that it fetches messages for the new chatId
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledTimes(2);
+      expect(fetch).toHaveBeenCalledWith(`${rootURL}/fetch-messages/chat-id-2`, expect.anything());
+    });
+  });
+
+  test('fetches new messages when chatId changes', async () => {
+    const { rerender } = setup('chat-id-1');
+    
+    expect(fetch).toHaveBeenCalledWith(`${rootURL}/fetch-messages/chat-id-1`, expect.anything());
+  
+    rerender(
+      <BrowserRouter>
+        <ThemeProvider value={{ theme: 'light', setTheme: jest.fn() }}>
+          <MessageDisplay chatId="chat-id-2" />
+        </ThemeProvider>
+      </BrowserRouter>
+    );
+
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledTimes(2);
+      expect(fetch).toHaveBeenCalledWith(`${rootURL}/fetch-messages/chat-id-2`, expect.anything());
     });
   });
 });
