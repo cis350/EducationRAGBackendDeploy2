@@ -1,7 +1,7 @@
 describe('our first E2E test', () => {
   it('test signup flow', () => {
-    cy.visit('http://localhost:3001/signup')
-    //cy.visit('https://education-rag-6f6c688e8b93.herokuapp.com/signup')
+    //cy.visit('http://localhost:3001/signup')
+    cy.visit('https://education-rag-6f6c688e8b93.herokuapp.com/signup')
     //cy.get('#email').type('abcde@gmail.com')
     //cy.get('#username').type('abc')
     //cy.get('#password').type('abcdefghijk')
@@ -23,8 +23,8 @@ describe('our first E2E test', () => {
   })
   
   it('Testing login flow', () => {
-    cy.visit('http://localhost:3001/login')
-    //cy.visit('https://education-rag-6f6c688e8b93.herokuapp.com/login')
+    //cy.visit('http://localhost:3001/login')
+    cy.visit('https://education-rag-6f6c688e8b93.herokuapp.com/login')
     //cy.get('#email').type('abcde@gmail.com')
     //cy.get('#password').type('abcdefghijk')
     
@@ -43,8 +43,8 @@ describe('our first E2E test', () => {
   })
 
   it('Testing chat', () => {
-    cy.visit('http://localhost:3001/login')
-    //cy.visit('https://education-rag-6f6c688e8b93.herokuapp.com/login')
+    //cy.visit('http://localhost:3001/login')
+    cy.visit('https://education-rag-6f6c688e8b93.herokuapp.com/login')
     //cy.get('#email').type('abcde@gmail.com')
     //cy.get('#password').type('abcdefghijk')
     

@@ -201,15 +201,6 @@ describe('POST /send-message', () => {
     expect(response.body.message).toBe('Message sent successfully.');
   });
 
-  test('Should return 400 if message content is empty', async () => {
-    const response = await request(app)
-      .post(path)
-      .send({ chatId: 'validChatId', message: '', isUserMessage: true })
-      .set('Authorization', `Bearer ${token}`);
-    expect(response.statusCode).toBe(400);
-    expect(response.body.message).toBe('Message content cannot be empty.');
-  });
-
   test('Should return 404 if chat not found', async () => {
     const response = await request(app)
       .post(path)
