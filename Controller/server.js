@@ -221,41 +221,47 @@ app.get('/protected-route', verifyToken, (_req, resp) => {
  */
 app.post('/send-message', verifyToken, async (req, res) => {
   const { chatId, message, isUserMessage } = req.body;
-  const userEmail = req.email;
+  const userEmail = req.email; // or req.userId based on your token decoding
+
   try {
     const user = await UserModel.findOne({ email: userEmail });
     if (!user) {
-      console.error('User not found');
       return res.status(404).json({ message: 'User not found.' });
     }
 
-    const chat = await ChatModel.findOne({ chatId, 'userEmail': userEmail });
+    let chat = await ChatModel.findOne({ chatId, 'userEmail': userEmail });
     if (!chat) {
-      console.error('Chat not found');
       return res.status(404).json({ message: 'Chat not found or access denied.' });
     }
 
-    if (!message.trim()) {
-      console.error('Empty message content');
-      return res.status(400).json({ message: 'Message content cannot be empty.' });
-    }
+    const messagesForAI = chat.messages.map(msg => ({
+      role: msg.isUserMessage ? 'user' : 'assistant',
+      content: msg.message
+    }));
+    messagesForAI.push({ role: 'user', content: message });
 
-    // Assuming generateChatResponse is a function that may throw an error
-    const aiResponse = await generateChatResponse([...chat.messages, message], user._id);
+    const aiResponse = await generateChatResponse(messagesForAI, user._id);
     if (!aiResponse) {
-      console.error('AI response generation failed');
       return res.status(500).json({ message: 'AI failed to generate a response.' });
     }
 
-    await ChatModel.findOneAndUpdate({ chatId, userEmail }, {
-      $push: { messages: { message, isUserMessage, createdAt: new Date() } }
-    });
+    const botMessage = {
+      message: aiResponse,
+      isUserMessage: false,
+      createdAt: new Date(),
+    };
 
-    console.log('Message sent successfully');
-    return res.status(201).json({ message: 'Message sent successfully.' });
-  } catch (error) {
-    console.error('Error in send-message:', error);
-    return res.status(500).json({ message: 'Error sending message.', error: error.message });
+    chat = await ChatModel.findOneAndUpdate(
+      { chatId, userEmail },
+      { $push: { messages: [{ message, isUserMessage, createdAt: new Date() }, botMessage] },
+        $set: { lastActivity: new Date() } },
+      { new: true }
+    );
+
+    res.status(201).json({ message: 'Message sent successfully.', chat: chat.messages });
+  } catch (err) {
+    console.error('Error sending message:', err);
+    res.status(500).json({ message: 'Error sending message.' });
   }
 });
 
